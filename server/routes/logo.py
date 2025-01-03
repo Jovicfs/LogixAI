@@ -1,8 +1,10 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, send_file, Response
 import logging
 import re
 import urllib.parse
 from math import sqrt
+import requests
+from io import BytesIO
 
 logo_bp = Blueprint('logo', __name__)
 
@@ -42,6 +44,37 @@ def generate_logo():
     except Exception as e:
         logger.exception("Error generating logo")
         return jsonify({'error': 'Internal server error'}), 500
+
+@logo_bp.route('/download_logo', methods=['POST'])
+def download_logo():
+    """Download the generated logo"""
+    try:
+        data = request.get_json()
+        image_url = data.get('imageUrl')
+        
+        if not image_url:
+            return jsonify({'error': 'No image URL provided'}), 400
+            
+        # Download the image from the URL
+        response = requests.get(image_url, stream=True)
+        if response.status_code != 200:
+            return jsonify({'error': 'Failed to download image'}), 400
+            
+        # Stream the file directly to the client
+        return Response(
+            response.iter_content(chunk_size=8192),
+            content_type=response.headers['Content-Type'],
+            headers={
+                'Content-Disposition': 'attachment; filename=logo.png',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Methods': '*'
+            }
+        )
+        
+    except Exception as e:
+        logger.exception("Error downloading logo")
+        return jsonify({'error': str(e)}), 500
 
 def hex_to_rgb(hex_color):
     """Convert hex color to RGB tuple."""
