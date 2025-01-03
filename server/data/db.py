@@ -1,7 +1,7 @@
 import logging
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, String, Text, text  # Import 'text'
+from sqlalchemy import create_engine, Column, Integer, String, Text, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
@@ -20,7 +20,7 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 try:
     engine = create_engine(DATABASE_URL)
     with engine.connect() as connection:
-        connection.execute(text("SELECT 1"))  # Correção: text("SELECT 1") com 't' minúsculo
+        connection.execute(text("SELECT 1"))
     logger.info("Conexão com o banco de dados estabelecida com sucesso.")
 except OperationalError as e:
     logger.error(f"Erro ao conectar com o banco de dados: {e}")
@@ -76,12 +76,12 @@ def create_user(username, email, password):
         user.set_password(password)
         session.add(user)
         session.commit()
-        logger.info(f"Usuário {username} criado com sucesso.") # Log de sucesso
+        logger.info(f"Usuário {username} criado com sucesso.")
         return user
     except Exception as e:
         session.rollback()
         logger.exception(f"Erro ao criar usuário {username}: {e}")
-        return None # Importante retornar None em caso de erro
+        return None
     finally:
         session.close()
 
@@ -119,6 +119,5 @@ def verify_token(token):
         return None
     finally:
         session.close()
-
 
 init_db()

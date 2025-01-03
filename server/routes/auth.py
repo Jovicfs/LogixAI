@@ -1,11 +1,10 @@
 from flask import request, jsonify, Blueprint
 import logging
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from data.db import create_user, get_user_by_username, update_user_token, verify_token
 
 # Blueprint de autenticação
 auth_bp = Blueprint('auth', __name__)
-
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
@@ -28,13 +27,19 @@ def signup():
             logger.warning(f"Username {username} already exists")
             return jsonify({'error': 'Username already exists'}), 409
 
-        hashed_password = generate_password_hash(password)
-        user = create_user(username, email, hashed_password)
+        user = create_user(username, email, password)  # Create user handles hashing
+        if user is None: #verifica se o usuario foi criado
+            return jsonify({'error': 'Error creating user'}), 500
         token = generate_token()
-        update_user_token(username, token)
+        if update_user_token(username, token) is None: #verifica se o token foi atualizado
+            return jsonify({'error': 'Error generating token'}), 500
 
         logger.info(f"User {username} signed up successfully")
-        return jsonify({'message': 'Signup successful', 'token': token}), 201
+        return jsonify({
+            'message': 'Signup successful',
+            'token': token,
+            'username': username  # Add username to response
+        }), 201
     except Exception as e:
         logger.exception(f"Error during signup: {e}")
         return jsonify({'error': 'Internal server error'}), 500
@@ -52,10 +57,10 @@ def login():
             return jsonify({'error': 'Missing username or password'}), 400
 
         user = get_user_by_username(username)
-        if user and check_password_hash(user.password, password):
+        if user and check_password_hash(user.password_hash, password): # Corrected line
             token = generate_token()
-            update_user_token(username, token)
-
+            if update_user_token(username, token) is None: #verifica se o token foi atualizado
+                return jsonify({'error': 'Error generating token'}), 500
             logger.info(f"User {username} logged in successfully")
             return jsonify({
                 'message': 'Login successful',

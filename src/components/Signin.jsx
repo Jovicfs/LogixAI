@@ -1,30 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Signin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful:', data);
-        // Redirect to home page or dashboard
+
+        // Store token and username in localStorage (for persistence)
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.user.username);
+
+        // Redirect to homepage and update UI with username
+        navigate('/'); // Redirect to homepage
       } else {
         console.error('Login failed');
+        // Handle login failure (e.g., display error message to user)
       }
     } catch (error) {
       console.error('Error:', error);
+      // Handle network errors (e.g., display generic error message)
     }
   };
+
+  useEffect(() => {
+    // Check for existing token and username in localStorage on component mount
+    const storedToken = localStorage.getItem('token');
+    const storedUsername = localStorage.getItem('username');
+
+    if (storedToken && storedUsername) {
+      // User is already logged in, redirect to homepage (optional)
+      navigate('/');  // Uncomment if automatic redirect is desired
+    }
+  }, []); // Empty dependency array to run only on component mount
 
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-300 min-h-screen flex flex-col items-center justify-center">
