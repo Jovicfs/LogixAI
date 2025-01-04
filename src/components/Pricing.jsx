@@ -49,11 +49,11 @@ function Pricing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
       <Header isLoggedIn={isLoggedIn} username={username} />
       
-      <main className="pt-24 pb-12">
-        <section id="pricing" className="container mx-auto px-4">
+      <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
+        <section id="pricing" className="h-full">
           <h2 className="text-3xl font-bold text-center mb-8">Nossos Planos</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {plans.map((plan, index) => (

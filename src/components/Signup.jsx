@@ -1,108 +1,183 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import Header from './shared/Header';
+import Footer from './shared/Footer';
 
 function Signup() {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+    const [errors, setErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const [errorMessage, setErrorMessage] = useState('');
 
-    const handleSignup = async () => {
-        if (password !== confirmPassword) {
-            setErrorMessage('Passwords do not match');
-            return;
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        
+        if (formData.password !== formData.confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
         }
 
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        setIsLoading(true);
         try {
             const response = await fetch('http://localhost:5000/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password }),
+                body: JSON.stringify({
+                    username: formData.username,
+                    email: formData.email,
+                    password: formData.password
+                }),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
-                console.log('Signup successful:', data);
-
-                // Store token and username in localStorage
                 localStorage.setItem('token', data.token);
-                localStorage.setItem('username', data.username); // Store username
-
-                // Redirect to homepage
+                localStorage.setItem('username', data.username);
                 navigate('/');
             } else {
-                const errorData = await response.json();//pega o erro do back end
-                if (errorData && errorData.error) {
-                    setErrorMessage(errorData.error); //exibe o erro do back end
-                } else {
-                    setErrorMessage('Signup failed.');//mensagem generica caso nao tenha erros especificos
-                }
-                console.error('Signup failed', errorData); // Log the error response
+                setErrors(data.errors || { general: 'Signup failed' });
             }
         } catch (error) {
-            console.error('Error:', error);
-            setErrorMessage('A network error occurred. Please try again later.'); //mensagem de erro de rede
+            setErrors({ general: 'Network error. Please try again later.' });
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="bg-gradient-to-r from-blue-400 to-blue-300 min-h-screen flex flex-col items-center justify-center">
-            <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-                <h2 className="text-3xl font-bold text-center mb-6 text-blue-600">Create an Account</h2>
-                {errorMessage && <div className="text-red-500 mb-4">{errorMessage}</div>} {/* Display error message */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Username:</label>
-                    <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Confirm Password:</label>
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                </div>
-                <button
-                    onClick={handleSignup}
-                    className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+            <Header isLoggedIn={false} />
+            
+            <main className="pt-24 pb-12">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8"
                 >
-                    Sign Up
-                </button>
-                <p className="text-center text-gray-600 mt-4">
-                    Already have an account?{' '}
-                    <a href="/sign-in" className="text-blue-500 hover:text-blue-700 font-bold">
-                        Log In
-                    </a>
-                </p>
-            </div>
+                    <div className="text-center mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
+                        <p className="text-gray-600 mt-2">Join LogixAI today</p>
+                    </div>
+
+                    <form onSubmit={handleSignup} className="space-y-6">
+                        {errors.general && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                            >
+                                <p className="text-red-600 text-center">{errors.general}</p>
+                            </motion.div>
+                        )}
+
+                        {/* Form Fields */}
+                        <InputField
+                            label="Username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            error={errors.username}
+                        />
+
+                        <InputField
+                            label="Email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            error={errors.email}
+                        />
+
+                        <InputField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            error={errors.password}
+                        />
+
+                        <InputField
+                            label="Confirm Password"
+                            name="confirmPassword"
+                            type="password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            error={errors.confirmPassword}
+                        />
+
+                        <motion.button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-blue-600 text-white font-semibold py-4 rounded-lg hover:bg-blue-700 transition-colors"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            {isLoading ? 'Creating Account...' : 'Create Account'}
+                        </motion.button>
+
+                        <p className="text-center text-gray-600">
+                            Already have an account?{' '}
+                            <Link to="/sign-in" className="text-blue-600 hover:underline">
+                                Sign in here
+                            </Link>
+                        </p>
+                    </form>
+                </motion.div>
+            </main>
+
+            <Footer />
         </div>
     );
 }
+
+const InputField = ({ label, name, type = 'text', value, onChange, error }) => (
+    <div>
+        <label className="block text-gray-700 font-medium mb-2">
+            {label}
+        </label>
+        <input
+            type={type}
+            name={name}
+            value={value}
+            onChange={onChange}
+            className={`w-full px-4 py-3 rounded-lg border ${
+                error ? 'border-red-500' : 'border-gray-300'
+            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+        />
+        {error && (
+            <p className="mt-1 text-red-500 text-sm">{error}</p>
+        )}
+    </div>
+);
 
 export default Signup;

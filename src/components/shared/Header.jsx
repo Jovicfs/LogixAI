@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-function Header({ isLoggedIn, username }) {
+function Header({ isLoggedIn, username, onShowLogos }) {
   const navigate = useNavigate();
   
   const features = [
@@ -31,6 +31,7 @@ function Header({ isLoggedIn, username }) {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     navigate('/');
+    window.location.reload(); // Force refresh to update all components
   };
 
   return (
@@ -58,6 +59,14 @@ function Header({ isLoggedIn, username }) {
           {isLoggedIn ? (
             <>
               <span className="text-gray-600">{username}</span>
+              {onShowLogos && (
+                <button
+                  onClick={onShowLogos}
+                  className="text-gray-600 hover:text-blue-600 px-4 py-2"
+                >
+                  Meus Logos
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors"
@@ -67,7 +76,7 @@ function Header({ isLoggedIn, username }) {
             </>
           ) : (
             <div className="flex space-x-4">
-              <Link to="/sign-in" className="text-gray-600 hover:text-blue-600">
+              <Link to="/sign-in" className="text-gray-600 hover:text-blue-600 px-4 py-2">
                 Login
               </Link>
               <Link to="/sign-up" className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700">

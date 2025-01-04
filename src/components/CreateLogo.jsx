@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
+import { useNavigate } from 'react-router-dom';
 
 function CreateLogo() {
   const [companyName, setCompanyName] = useState('');
@@ -13,11 +14,24 @@ function CreateLogo() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [savedLogos, setSavedLogos] = useState([]);
   const [showStorageMenu, setShowStorageMenu] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProtectedData();
-    loadSavedLogos();
+    const checkAuthAndLoadData = async () => {
+      await fetchProtectedData();
+      await loadSavedLogos();
+    };
+    
+    checkAuthAndLoadData();
   }, []);
+
+  // Add this effect to reload logos when storage menu is opened
+  useEffect(() => {
+    if (showStorageMenu) {
+      loadSavedLogos();
+    }
+  }, [showStorageMenu]);
 
   const fetchProtectedData = async () => {
     try {
@@ -199,6 +213,7 @@ function CreateLogo() {
   ];
 
   const handleLogout = () => {
+    setIsLoggedIn(false);
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     navigate('/');
@@ -253,11 +268,14 @@ function CreateLogo() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Header isLoggedIn={true} username={localStorage.getItem('username')} />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+      <Header 
+        isLoggedIn={isLoggedIn} 
+        username={localStorage.getItem('username')}
+        onShowLogos={() => setShowStorageMenu(true)}
+      />
       
-      {/* Main Content */}
-      <main className="container mx-auto px-4 pt-24 pb-12">
+      <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

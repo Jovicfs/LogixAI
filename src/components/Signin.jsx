@@ -1,85 +1,162 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import Header from './shared/Header';
+import Footer from './shared/Footer';
 
 function Signin() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
+    }
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsLoading(true);
     try {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login successful:', data);
+      const data = await response.json();
 
-        // Store token and username in localStorage (for persistence)
+      if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.user.username);
-
-        // Redirect to homepage and update UI with username
-        navigate('/'); // Redirect to homepage
+        navigate('/');
       } else {
-        console.error('Login failed');
-        // Handle login failure (e.g., display error message to user)
+        setErrors({
+          submit: data.error || 'Invalid username or password'
+        });
       }
     } catch (error) {
-      console.error('Error:', error);
-      // Handle network errors (e.g., display generic error message)
+      setErrors({
+        submit: 'Network error. Please try again later.'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    // Check for existing token and username in localStorage on component mount
-    const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
-
-    if (storedToken && storedUsername) {
-      // User is already logged in, redirect to homepage (optional)
-      navigate('/');  // Uncomment if automatic redirect is desired
-    }
-  }, []); // Empty dependency array to run only on component mount
-
   return (
-    <div className="bg-gradient-to-r from-blue-400 to-blue-300 min-h-screen flex flex-col items-center justify-center">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Welcome Back</h2>
-        <p className="text-center text-gray-500 mb-4">Login to your account</p>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your username"
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your password"
-          />
-        </div>
-        <button
-          onClick={handleLogin}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <Header isLoggedIn={false} />
+      
+      <main className="pt-24 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8"
         >
-          Login
-        </button>
-        <p className="text-center text-gray-500 mt-4">
-          Don't have an account? <a href="/sign-up" className="text-blue-600 hover:underline">Sign Up</a>
-        </p>
-      </div>
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+            <p className="text-gray-600 mt-2">Sign in to your account</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.username ? 'border-red-500' : 'border-gray-300'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                placeholder="Enter your username"
+              />
+              {errors.username && (
+                <p className="mt-1 text-red-500 text-sm">{errors.username}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.password ? 'border-red-500' : 'border-gray-300'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                placeholder="Enter your password"
+              />
+              {errors.password && (
+                <p className="mt-1 text-red-500 text-sm">{errors.password}</p>
+              )}
+            </div>
+
+            {errors.submit && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-4 bg-red-50 border border-red-200 rounded-lg"
+              >
+                <p className="text-red-600 text-center">{errors.submit}</p>
+              </motion.div>
+            )}
+
+            <motion.button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white font-semibold py-4 rounded-lg hover:bg-blue-700 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </motion.button>
+
+            <p className="text-center text-gray-600">
+              Don't have an account?{' '}
+              <Link to="/sign-up" className="text-blue-600 hover:underline">
+                Sign up here
+              </Link>
+            </p>
+          </form>
+        </motion.div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

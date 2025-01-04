@@ -19,20 +19,35 @@ def signup():
         email = data.get('email')
         password = data.get('password')
 
-        if not all([username, email, password]):
-            logger.error("Missing username, email, or password")
-            return jsonify({'error': 'Missing username, email, or password'}), 400
+        # Detailed validation
+        errors = {}
+        if not username:
+            errors['username'] = 'Username is required'
+        elif len(username) < 3:
+            errors['username'] = 'Username must be at least 3 characters'
+        
+        if not email:
+            errors['email'] = 'Email is required'
+        elif '@' not in email:
+            errors['email'] = 'Invalid email format'
+            
+        if not password:
+            errors['password'] = 'Password is required'
+        elif len(password) < 6:
+            errors['password'] = 'Password must be at least 6 characters'
+
+        if errors:
+            return jsonify({'errors': errors}), 400
 
         if get_user_by_username(username):
-            logger.warning(f"Username {username} already exists")
-            return jsonify({'error': 'Username already exists'}), 409
+            return jsonify({'errors': {'username': 'Username already exists'}}), 409
 
         user = create_user(username, email, password)  # Create user handles hashing
         if user is None: #verifica se o usuario foi criado
-            return jsonify({'error': 'Error creating user'}), 500
+            return jsonify({'errors': {'general': 'Error creating user'}}), 500
         token = generate_token()
         if update_user_token(username, token) is None: #verifica se o token foi atualizado
-            return jsonify({'error': 'Error generating token'}), 500
+            return jsonify({'errors': {'general': 'Error generating token'}}), 500
 
         logger.info(f"User {username} signed up successfully")
         return jsonify({
@@ -42,7 +57,7 @@ def signup():
         }), 201
     except Exception as e:
         logger.exception(f"Error during signup: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'errors': {'general': 'Internal server error'}}), 500
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -52,15 +67,20 @@ def login():
         username = data.get('username')
         password = data.get('password')
 
-        if not all([username, password]):
-            logger.error("Missing username or password")
-            return jsonify({'error': 'Missing username or password'}), 400
+        errors = {}
+        if not username:
+            errors['username'] = 'Username is required'
+        if not password:
+            errors['password'] = 'Password is required'
+
+        if errors:
+            return jsonify({'errors': errors}), 400
 
         user = get_user_by_username(username)
         if user and check_password_hash(user.password_hash, password): # Corrected line
             token = generate_token()
             if update_user_token(username, token) is None: #verifica se o token foi atualizado
-                return jsonify({'error': 'Error generating token'}), 500
+                return jsonify({'errors': {'general': 'Error generating token'}}), 500
             logger.info(f"User {username} logged in successfully")
             return jsonify({
                 'message': 'Login successful',
@@ -72,10 +92,10 @@ def login():
             }), 200
         else:
             logger.warning(f"Login failed for user {username}")
-            return jsonify({'error': 'Invalid username or password'}), 401
+            return jsonify({'errors': {'general': 'Invalid username or password'}}), 401
     except Exception as e:
         logger.exception(f"Error during login: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'errors': {'general': 'Internal server error'}}), 500
 
 @auth_bp.route('/protected', methods=['GET'])
 def protected():
