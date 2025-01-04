@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../App';
+import { auth } from '../../utils/api';
 
-function Header({ isLoggedIn, username, onShowLogos }) {
+function Header({ onShowLogos }) {
+  const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const features = [
@@ -27,11 +30,14 @@ function Header({ isLoggedIn, username, onShowLogos }) {
     }
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    navigate('/');
-    window.location.reload(); // Force refresh to update all components
+  const handleLogout = async () => {
+    try {
+      await auth.logout();
+      navigate('/');
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -56,9 +62,9 @@ function Header({ isLoggedIn, username, onShowLogos }) {
         </nav>
 
         <div className="flex items-center space-x-4">
-          {isLoggedIn ? (
+          {authState.isAuthenticated ? (
             <>
-              <span className="text-gray-600">{username}</span>
+              <span className="text-gray-600">{authState.username}</span>
               {onShowLogos && (
                 <button
                   onClick={onShowLogos}

@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint, send_file, Response
+from flask import request, jsonify, Blueprint, send_file, Response, current_app
 import logging
 import re
 import urllib.parse
@@ -17,9 +17,13 @@ def before_request():
     if request.method == 'OPTIONS':
         return '', 204
     
-    # Log incoming requests for debugging
+    # Get token from secure cookie instead of headers
+    token = request.cookies.get('session')
+    if not token and request.path not in ['/login', '/register']:
+        return jsonify({'error': 'No authentication cookie'}), 401
+
+    request.token = token
     logger.info(f"Incoming request: {request.method} {request.path}")
-    logger.info(f"Headers: {dict(request.headers)}")
 
 @logo_bp.route('/generate_logo', methods=['POST', 'OPTIONS'])
 def generate_logo():
@@ -29,14 +33,14 @@ def generate_logo():
     Gera um logo com base nas informações fornecidas pelo usuário.
     """
     try:
-        # Verify user authentication
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({'error': 'No authorization token'}), 401
+        # Verify user authentication from cookie
+        token = request.cookies.get('session')
+        if not token:
+            return jsonify({'error': 'No authentication cookie'}), 401
             
-        user = verify_token(auth_header)
+        user = verify_token(token)
         if not user:
-            return jsonify({'error': 'Invalid token'}), 401
+            return jsonify({'error': 'Invalid session'}), 401
 
         data = request.get_json()
         company_name = data.get('companyName')
@@ -120,20 +124,13 @@ def get_logos():
     if request.method == 'OPTIONS':
         return '', 204
     try:
-        auth_header = request.headers.get('Authorization')
-        logger.info(f"Auth header: {auth_header}")  # Debug log
-        if not auth_header:
-            logger.error("No authorization token provided")
-            return jsonify({'error': 'No authorization token'}), 401
-            
-        # Remove 'Bearer ' if present, otherwise use the token as is
-        token = auth_header.replace('Bearer ', '') if auth_header.startswith('Bearer ') else auth_header
-        logger.info(f"Attempting to verify token: {token[:10]}...")  # Log first 10 chars for debugging
+        token = request.cookies.get('session')
+        if not token:
+            return jsonify({'error': 'No session cookie'}), 401
             
         user = verify_token(token)
         if not user:
-            logger.error("Invalid token provided")
-            return jsonify({'error': 'Invalid token'}), 401
+            return jsonify({'error': 'Invalid session'}), 401
 
         logos = get_user_logos(user.id)
         logger.info(f"Found {len(logos)} logos for user {user.id}")
@@ -159,13 +156,13 @@ def remove_logo(logo_id):
     if request.method == 'OPTIONS':
         return '', 204
     try:
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({'error': 'No authorization token'}), 401
+        token = request.cookies.get('session')
+        if not token:
+            return jsonify({'error': 'No session cookie'}), 401
             
-        user = verify_token(auth_header)
+        user = verify_token(token)
         if not user:
-            return jsonify({'error': 'Invalid token'}), 401
+            return jsonify({'error': 'Invalid session'}), 401
 
         if delete_logo(logo_id, user.id):
             return jsonify({'message': 'Logo deleted successfully'}), 200

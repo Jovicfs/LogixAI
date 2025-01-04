@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../App';
 
 function CreateLogo() {
   const [companyName, setCompanyName] = useState('');
@@ -14,135 +15,69 @@ function CreateLogo() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [savedLogos, setSavedLogos] = useState([]);
   const [showStorageMenu, setShowStorageMenu] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuthAndLoadData = async () => {
-      await fetchProtectedData();
-      await loadSavedLogos();
-    };
-    
-    checkAuthAndLoadData();
-  }, []);
-
-  // Add this effect to reload logos when storage menu is opened
-  useEffect(() => {
-    if (showStorageMenu) {
+    if (!authState.isAuthenticated && !authState.loading) {
+      navigate('/sign-in');
+    } else {
       loadSavedLogos();
     }
-  }, [showStorageMenu]);
+  }, [authState.isAuthenticated, authState.loading]);
 
-  const fetchProtectedData = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/protected', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, // Corrigido: Adicionado "Bearer"
-        },
-      });
+  const fetchWithCreds = async (url, options = {}) => {
+    const defaultOptions = {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      ...options
+    };
 
-      if (response.ok) {
-        const data = await response.json();
-        setProtectedMessage(data.message);
-      } else {
-        console.error('Failed to fetch protected data');
-      }
-    } catch (error) {
-      console.error('Error:', error);
+    const response = await fetch(`http://localhost:5000${url}`, defaultOptions);
+    if (!response.ok) {
+      throw new Error('Request failed');
     }
+    return response;
   };
 
   const loadSavedLogos = async () => {
     try {
-      const token = localStorage.getItem('token');
-      console.log('Loading logos with token:', token);
-      
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
-
-      const response = await fetch('http://localhost:5000/user_logos', {
-        method: 'GET',
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        mode: 'cors',
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      const response = await fetchWithCreds('/user_logos');
       const data = await response.json();
-      console.log('Response data:', data);
-
       setSavedLogos(data.logos || []);
     } catch (error) {
       console.error('Error loading logos:', error);
-      // Add user feedback
-      alert('Failed to load logos. Please try logging in again.');
     }
   };
 
-  // Update all other fetch calls with similar configuration
-  const fetchWithAuth = async (url, options = {}) => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No authentication token');
-
-    const defaultOptions = {
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      mode: 'cors',
-      credentials: 'include',
-    };
-
-    const response = await fetch(url, { ...defaultOptions, ...options });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return response;
-  };
-
-  // Use fetchWithAuth in other functions
   const handleGenerateLogo = async () => {
     try {
-      const response = await fetchWithAuth('http://localhost:5000/generate_logo', {
+      const response = await fetchWithCreds('/generate_logo', {
         method: 'POST',
         body: JSON.stringify({
           companyName,
           sector,
           style,
           color: color.replace('#', '')
-        }),
+        })
       });
 
       const data = await response.json();
       setGeneratedLogo(data.logo);
-      loadSavedLogos();
+      await loadSavedLogos();
     } catch (error) {
       console.error('Error generating logo:', error);
-      alert('Failed to generate logo. Please try again.');
     }
   };
 
   const deleteLogo = async (logoId) => {
     try {
-      const response = await fetchWithAuth(`http://localhost:5000/delete_logo/${logoId}`, {
-        method: 'DELETE',
+      await fetchWithCreds(`/delete_logo/${logoId}`, {
+        method: 'DELETE'
       });
-
-      if (response.ok) {
-        loadSavedLogos(); // Reload logos after deletion
-      } else {
-        console.error('Failed to delete logo');
-      }
+      await loadSavedLogos();
     } catch (error) {
       console.error('Error deleting logo:', error);
     }
@@ -270,8 +205,8 @@ function CreateLogo() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
       <Header 
-        isLoggedIn={isLoggedIn} 
-        username={localStorage.getItem('username')}
+        isLoggedIn={authState.isAuthenticated} 
+        username={authState.username}
         onShowLogos={() => setShowStorageMenu(true)}
       />
       

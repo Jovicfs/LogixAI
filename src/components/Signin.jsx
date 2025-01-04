@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
+import { auth } from '../utils/api';
 
 function Signin() {
   const [formData, setFormData] = useState({
@@ -46,26 +47,14 @@ function Signin() {
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.user.username);
+      const response = await auth.login(formData);
+      if (response.success) {
         navigate('/');
-      } else {
-        setErrors({
-          submit: data.error || 'Invalid username or password'
-        });
+        window.location.reload();
       }
     } catch (error) {
       setErrors({
-        submit: 'Network error. Please try again later.'
+        submit: 'Invalid username or password'
       });
     } finally {
       setIsLoading(false);

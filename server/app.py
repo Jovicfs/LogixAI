@@ -2,19 +2,30 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import logging  
+import os
 from routes.auth import auth_bp
 from routes.logo import logo_bp
 
 load_dotenv()
 
 app = Flask(__name__)
+app.config.update(
+    SECRET_KEY=os.getenv('SECRET_KEY', 'your-secret-key'),
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
 
 # Simplified CORS configuration
-CORS(app, 
-     origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-     allow_headers=["Content-Type", "Authorization"],
-     supports_credentials=True,
-     expose_headers=["Content-Type", "Authorization"])
+CORS(app, supports_credentials=True, resources={
+        r"/*": {
+            "origins": ["http://localhost:5173"],  # Add your frontend URL
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],  # Added Authorization
+            "expose_headers": ["Set-Cookie"],
+            "supports_credentials": True
+        }
+    })
 
 # Configuração do logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
