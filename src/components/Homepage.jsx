@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // Add framer-motion for animations
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import Header from './shared/Header';
+import Footer from './shared/Footer';
 
 function HomePage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
@@ -15,14 +16,6 @@ function HomePage() {
             setUsername(storedUsername);
         }
     }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-        setIsLoggedIn(false);
-        setUsername('');
-        navigate('/'); // Redireciona para a página inicial após o logout
-    };
 
     const features = [
         {
@@ -47,7 +40,13 @@ function HomePage() {
             title: 'Edição Inteligente',
             description: 'Ferramentas avançadas de edição com IA.',
             icon: '⚡',
-            path: '/smart-edit'
+            path: '/smart-edit' 
+        },
+        {
+            title: 'Planos',
+            description: 'Selecione o Plano que mais se encaixa com você!',
+            icon: '📈',
+            path: '/pricing'
         }
     ];
 
@@ -63,49 +62,8 @@ function HomePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-            {/* Header */}
-            <header className="fixed w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
-                <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-                    <Link to="/" className="flex items-center space-x-2">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
-                            LogixAI
-                        </span>
-                    </Link>
-
-                    <nav className="hidden md:flex space-x-8">
-                        {features.map(feature => (
-                            <Link
-                                key={feature.path}
-                                to={feature.path}
-                                className="text-gray-600 hover:text-blue-600 transition-colors"
-                            >
-                                {feature.title}
-                            </Link>
-                        ))}
-                    </nav>
-
-                    <div className="flex items-center space-x-4">
-                        {isLoggedIn ? (
-                            <>
-                                <span className="text-gray-600">{username}</span> {/* Exibe o nome do usuário */}
-                                <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">
-                                    Sair
-                                </button>
-                            </>
-                        ) : (
-                            <div className="flex space-x-4">
-                                <Link to="/sign-in" className="text-gray-600 hover:text-blue-600">
-                                    Login
-                                </Link>
-                                <Link to="/sign-up" className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700">
-                                    Começar Agora
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </header>
-
+            <Header isLoggedIn={isLoggedIn} username={username} />
+            
             {/* Hero Section */}
             <section className="pt-32 pb-20 px-4">
                 <div className="container mx-auto text-center">
@@ -201,18 +159,7 @@ function HomePage() {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="bg-gray-900 text-white py-12">
-                <div className="container mx-auto px-4">
-                    <div className="grid md:grid-cols-4 gap-8">
-                        <div>
-                            <h3 className="text-xl font-bold mb-4">LogixAI</h3>
-                            <p className="text-gray-400">Transformando ideias em realidade com IA</p>
-                        </div>
-                        {/* Add more footer sections */}
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

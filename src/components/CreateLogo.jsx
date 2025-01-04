@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Header from './shared/Header';
+import Footer from './shared/Footer';
 
 function CreateLogo() {
   const [companyName, setCompanyName] = useState('');
@@ -253,44 +254,8 @@ function CreateLogo() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
-      <header className="fixed w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
-              LogixAI
-            </span>
-          </Link>
-
-          <nav className="hidden md:flex space-x-8">
-            {features.map(feature => (
-              <Link
-                key={feature.path}
-                to={feature.path}
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                {feature.title}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowStorageMenu(true)}
-              className="text-gray-600 hover:text-blue-600"
-            >
-              Meus Logos
-            </button>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors"
-            >
-              Sair
-            </button>
-          </div>
-        </div>
-      </header>
-
+      <Header isLoggedIn={true} username={localStorage.getItem('username')} />
+      
       {/* Main Content */}
       <main className="container mx-auto px-4 pt-24 pb-12">
         <motion.div
@@ -411,6 +376,8 @@ function CreateLogo() {
 
       {/* Storage Menu Modal */}
       {showStorageMenu && <StorageMenu />}
+      
+      <Footer />
     </div>
   );
 }
