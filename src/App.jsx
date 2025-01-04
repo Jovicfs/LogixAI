@@ -6,7 +6,8 @@ import React from 'react';
     import Pricing from './components/pricing';
     import About from './components/about';
     import CreateLogo from './components/CreateLogo';
-
+    import GenerateImage from './components/GenerateImage';
+    import GenerateVideo from './components/GenerateVideo';
     function App() {
       return (
         <Routes>
@@ -16,6 +17,8 @@ import React from 'react';
           <Route path='/pricing' element={<Pricing/>}/>
           <Route path='/about' element={<About/>}/>
           <Route path='create-logo' element={<CreateLogo/>}/>
+          <Route path='create-image' element={<GenerateImage/>}/>
+          <Route path='create-video' element={<GenerateVideo/>}/>
         </Routes>
       );
     }
