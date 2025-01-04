@@ -90,7 +90,7 @@ def protected():
         user = verify_token(token)
         if user:
             logger.info(f"User {user.username} accessed protected route")
-            return jsonify({'message': f'Welcome, {user.username}! This is a protected route.'}), 200
+            return jsonify({'message': f'Welcome, {user.username}! Create your Logo with LogixAI.'}), 200
         else:
             logger.warning("Invalid token")
             return jsonify({'error': 'Invalid token'}), 403

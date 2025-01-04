@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 function CreateLogo() {
   const [companyName, setCompanyName] = useState('');
@@ -176,6 +178,31 @@ function CreateLogo() {
     }
   };
 
+  const features = [
+    {
+      title: 'Criação de Vídeos',
+      path: '/create-video'
+    },
+    {
+      title: 'Design de Logos',
+      path: '/create-logo'
+    },
+    {
+      title: 'Geração de Imagens',
+      path: '/create-image'
+    },
+    {
+      title: 'Edição Inteligente',
+      path: '/smart-edit'
+    }
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    navigate('/');
+  };
+
   const StorageMenu = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-11/12 max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -225,121 +252,165 @@ function CreateLogo() {
   );
 
   return (
-    <div className="bg-gradient-to-r from-blue-400 to-blue-300 min-h-screen flex flex-col items-center justify-center">
-      <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-600">AI Logo Generator</h1>
-          <button
-            onClick={() => setShowStorageMenu(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            Saved Logos
-          </button>
-        </div>
-        
-        <p className="text-center text-gray-500 mb-4">{protectedMessage}</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Header */}
+      <header className="fixed w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
+              LogixAI
+            </span>
+          </Link>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Company Name:</label>
-            <input
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="e.g., TechCorp"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Sector:</label>
-            <input
-              type="text"
-              value={sector}
-              onChange={(e) => setSector(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="e.g., Technology"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Style:</label>
-            <input
-              type="text"
-              value={style}
-              onChange={(e) => setStyle(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="e.g., Modern, Minimal"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Color Preference:</label>
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="w-full h-12 p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={handleGenerateLogo}
-          className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg mt-6 hover:bg-blue-700 transition duration-300"
-        >
-          Generate Logo
-        </button>
-
-        <div className="mt-8 text-center">
-          {generatedLogo ? (
-            <>
-              <img
-                src={generatedLogo}
-                alt="Generated Logo"
-                className="mx-auto max-w-full h-auto border border-gray-300 rounded-lg p-4"
-              />
-              <button
-                onClick={handleDownloadLogo}
-                disabled={isDownloading}
-                className="mt-4 bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300"
+          <nav className="hidden md:flex space-x-8">
+            {features.map(feature => (
+              <Link
+                key={feature.path}
+                to={feature.path}
+                className="text-gray-600 hover:text-blue-600 transition-colors"
               >
-                {isDownloading ? 'Downloading...' : 'Download Logo'}
-              </button>
-            </>
-          ) : (
-            <p className="text-gray-500">Your generated logo will appear here.</p>
-          )}
-        </div>
+                {feature.title}
+              </Link>
+            ))}
+          </nav>
 
-        <h2 className="text-xl font-bold mt-10 text-gray-800">Logo Editor</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Edit Color:</label>
-            <input
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="w-full h-12 p-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Font Style:</label>
-            <select
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowStorageMenu(true)}
+              className="text-gray-600 hover:text-blue-600"
             >
-              <option>Arial</option>
-              <option>Helvetica</option>
-              <option>Times New Roman</option>
-              <option>Roboto</option>
-              <option>Montserrat</option>
-            </select>
+              Meus Logos
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors"
+            >
+              Sair
+            </button>
           </div>
         </div>
-        
-        {showStorageMenu && <StorageMenu />}
-      </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 pt-24 pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+        >
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Crie Seu Logo</h1>
+            <p className="text-gray-600 mt-2">{protectedMessage}</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Nome da Empresa</label>
+                <input
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: TechCorp"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Setor</label>
+                <input
+                  type="text"
+                  value={sector}
+                  onChange={(e) => setSector(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: Tecnologia"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Estilo</label>
+                <input
+                  type="text"
+                  value={style}
+                  onChange={(e) => setStyle(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Ex: Minimalista, Futurista, Orgânico, Vintage..."
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Seja criativo!
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Cor Principal</label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    className="h-12 w-24 border border-gray-300 rounded-lg cursor-pointer"
+                  />
+                  <span className="text-gray-600">{color.toUpperCase()}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          <motion.button
+            onClick={handleGenerateLogo}
+            className="w-full bg-blue-600 text-white font-semibold py-4 rounded-lg hover:bg-blue-700 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Gerar Logo
+          </motion.button>
+
+          {/* Logo Preview */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-12"
+          >
+            {generatedLogo ? (
+              <div className="space-y-6">
+                <img
+                  src={generatedLogo}
+                  alt="Logo Gerado"
+                  className="max-w-md mx-auto rounded-lg shadow-lg"
+                />
+                <motion.button
+                  onClick={handleDownloadLogo}
+                  disabled={isDownloading}
+                  className="mx-auto block bg-green-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isDownloading ? 'Baixando...' : 'Baixar Logo'}
+                </motion.button>
+              </div>
+            ) : (
+              <p className="text-center text-gray-500">
+                Seu logo aparecerá aqui após a geração
+              </p>
+            )}
+          </motion.div>
+        </motion.div>
+      </main>
+
+      {/* Storage Menu Modal */}
+      {showStorageMenu && <StorageMenu />}
     </div>
   );
 }
