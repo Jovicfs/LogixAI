@@ -5,18 +5,39 @@ import urllib.parse
 from math import sqrt
 import requests
 from io import BytesIO
+from data.db import save_logo, get_user_logos, delete_logo, verify_token
 
 logo_bp = Blueprint('logo', __name__)
 
 # Configuração do logger
 logger = logging.getLogger(__name__)
 
-@logo_bp.route('/generate_logo', methods=['POST'])
+@logo_bp.before_request
+def before_request():
+    if request.method == 'OPTIONS':
+        return '', 204
+    
+    # Log incoming requests for debugging
+    logger.info(f"Incoming request: {request.method} {request.path}")
+    logger.info(f"Headers: {dict(request.headers)}")
+
+@logo_bp.route('/generate_logo', methods=['POST', 'OPTIONS'])
 def generate_logo():
+    if request.method == 'OPTIONS':
+        return '', 204
     """
     Gera um logo com base nas informações fornecidas pelo usuário.
     """
     try:
+        # Verify user authentication
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'No authorization token'}), 401
+            
+        user = verify_token(auth_header)
+        if not user:
+            return jsonify({'error': 'Invalid token'}), 401
+
         data = request.get_json()
         company_name = data.get('companyName')
         sector = data.get('sector')
@@ -38,8 +59,25 @@ def generate_logo():
 
         # Simulação de geração de imagem com IA
         image_url = generate_ai_image(company_name, sector, style, color)
+        
+        # Save logo to database and get data
+        logo_data = save_logo(
+            user_id=user.id,
+            company_name=company_name,
+            sector=sector,
+            style=style,
+            color=color,
+            image_url=image_url
+        )
+        
+        if not logo_data:
+            return jsonify({'error': 'Failed to save logo'}), 500
+
         logger.info(f"Generated logo for {company_name}")
-        return jsonify({'logo': image_url}), 200
+        return jsonify({
+            'logo': image_url,
+            'logo_id': logo_data['id']
+        }), 200
 
     except Exception as e:
         logger.exception("Error generating logo")
@@ -75,6 +113,67 @@ def download_logo():
     except Exception as e:
         logger.exception("Error downloading logo")
         return jsonify({'error': str(e)}), 500
+
+@logo_bp.route('/user_logos', methods=['GET', 'OPTIONS'])
+def get_logos():
+    """Get user logos"""
+    if request.method == 'OPTIONS':
+        return '', 204
+    try:
+        auth_header = request.headers.get('Authorization')
+        logger.info(f"Auth header: {auth_header}")  # Debug log
+        if not auth_header:
+            logger.error("No authorization token provided")
+            return jsonify({'error': 'No authorization token'}), 401
+            
+        # Remove 'Bearer ' if present, otherwise use the token as is
+        token = auth_header.replace('Bearer ', '') if auth_header.startswith('Bearer ') else auth_header
+        logger.info(f"Attempting to verify token: {token[:10]}...")  # Log first 10 chars for debugging
+            
+        user = verify_token(token)
+        if not user:
+            logger.error("Invalid token provided")
+            return jsonify({'error': 'Invalid token'}), 401
+
+        logos = get_user_logos(user.id)
+        logger.info(f"Found {len(logos)} logos for user {user.id}")
+        
+        return jsonify({
+            'logos': [{
+                'id': logo.id,
+                'company_name': logo.company_name,
+                'sector': logo.sector,
+                'style': logo.style,
+                'color': logo.color,
+                'image_url': logo.image_url,
+                'created_at': logo.created_at
+            } for logo in logos]
+        }), 200
+
+    except Exception as e:
+        logger.exception("Error fetching logos")
+        return jsonify({'error': str(e)}), 500
+
+@logo_bp.route('/delete_logo/<int:logo_id>', methods=['DELETE', 'OPTIONS'])
+def remove_logo(logo_id):
+    if request.method == 'OPTIONS':
+        return '', 204
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'No authorization token'}), 401
+            
+        user = verify_token(auth_header)
+        if not user:
+            return jsonify({'error': 'Invalid token'}), 401
+
+        if delete_logo(logo_id, user.id):
+            return jsonify({'message': 'Logo deleted successfully'}), 200
+        return jsonify({'error': 'Logo not found'}), 404
+
+    except Exception as e:
+        logger.exception("Error deleting logo")
+        return jsonify({'error': 'Internal server error'}), 500
 
 def hex_to_rgb(hex_color):
     """Convert hex color to RGB tuple."""

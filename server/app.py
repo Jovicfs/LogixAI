@@ -1,23 +1,38 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import logging  
-from routes.auth import login, signup, protected  
-from routes.logo import generate_logo
+from routes.auth import auth_bp
+from routes.logo import logo_bp
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+
+# Simplified CORS configuration
+CORS(app, 
+     origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+     allow_headers=["Content-Type", "Authorization"],
+     supports_credentials=True,
+     expose_headers=["Content-Type", "Authorization"])
 
 # Configuração do logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Registrar rotas
-app.add_url_rule('/login', methods=['POST'], view_func=login)
-app.add_url_rule('/signup', methods=['POST'], view_func=signup)
-app.add_url_rule('/protected', methods=['GET'], view_func=protected)
-app.add_url_rule('/generate_logo', methods=['POST'], view_func=generate_logo) 
+# Register blueprints
+app.register_blueprint(auth_bp)
+app.register_blueprint(logo_bp)
+
+# Remove the @app.after_request decorator since CORS is handled by flask-cors
+# @app.after_request
+# def after_request(response):
+#     origin = request.headers.get('Origin')
+#     if origin in ["http://localhost:5173", "http://127.0.0.1:5173"]:
+#         response.headers.add('Access-Control-Allow-Origin', origin)
+#         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+#         response.headers.add('Access-Control-Allow-Credentials', 'true')
+#     return response
 
 # Tratamento de erros
 @app.errorhandler(404)

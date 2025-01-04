@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 # Configuração do Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -45,6 +46,17 @@ class User(Base):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class Logo(Base):
+    __tablename__ = 'logos'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False)
+    company_name = Column(String, nullable=False)
+    sector = Column(String)
+    style = Column(String)
+    color = Column(String)
+    image_url = Column(String, nullable=False)
+    created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
 def init_db():
     try:
@@ -117,6 +129,61 @@ def verify_token(token):
     except Exception as e:
         logger.exception(f"Erro ao verificar token: {e}")
         return None
+    finally:
+        session.close()
+
+def save_logo(user_id, company_name, sector, style, color, image_url):
+    session = SessionLocal()
+    try:
+        logo = Logo(
+            user_id=user_id,
+            company_name=company_name,
+            sector=sector,
+            style=style,
+            color=color,
+            image_url=image_url
+        )
+        session.add(logo)
+        session.commit()
+        # Get all necessary data before closing the session
+        logo_data = {
+            'id': logo.id,
+            'image_url': logo.image_url,
+            'company_name': logo.company_name,
+            'created_at': logo.created_at
+        }
+        return logo_data
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Error saving logo: {e}")
+        return None
+    finally:
+        session.close()
+
+def get_user_logos(user_id):
+    session = SessionLocal()
+    try:
+        logos = session.query(Logo).filter(Logo.user_id == user_id).all()
+        return logos
+    except Exception as e:
+        logger.exception(f"Error fetching logos: {e}")
+        return []
+    finally:
+        session.close()
+
+def delete_logo(logo_id, user_id):
+    session = SessionLocal()
+    try:
+        logo = session.query(Logo).filter(Logo.id == logo_id, Logo.user_id == user_id).first()
+        if logo:
+            session.delete(logo)
+            session.commit()
+            return True
+        return False
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Error deleting logo: {e}")
+        return False
     finally:
         session.close()
 

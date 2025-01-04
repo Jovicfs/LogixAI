@@ -8,9 +8,12 @@ function CreateLogo() {
   const [generatedLogo, setGeneratedLogo] = useState('');
   const [protectedMessage, setProtectedMessage] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [savedLogos, setSavedLogos] = useState([]);
+  const [showStorageMenu, setShowStorageMenu] = useState(false);
 
   useEffect(() => {
     fetchProtectedData();
+    loadSavedLogos();
   }, []);
 
   const fetchProtectedData = async () => {
@@ -19,7 +22,7 @@ function CreateLogo() {
       const response = await fetch('http://localhost:5000/protected', {
         method: 'GET',
         headers: {
-          'Authorization': token,
+          'Authorization': `Bearer ${token}`, // Corrigido: Adicionado "Bearer"
         },
       });
 
@@ -34,40 +37,117 @@ function CreateLogo() {
     }
   };
 
-  const handleGenerateLogo = async () => {
+  const loadSavedLogos = async () => {
     try {
-      console.log('Generating logo with parameters:', {
-        companyName,
-        sector,
-        style,
-        color
+      const token = localStorage.getItem('token');
+      console.log('Loading logos with token:', token);
+      
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/user_logos', {
+        method: 'GET',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'include',
       });
 
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/generate_logo', {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      setSavedLogos(data.logos || []);
+    } catch (error) {
+      console.error('Error loading logos:', error);
+      // Add user feedback
+      alert('Failed to load logos. Please try logging in again.');
+    }
+  };
+
+  // Update all other fetch calls with similar configuration
+  const fetchWithAuth = async (url, options = {}) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No authentication token');
+
+    const defaultOptions = {
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      mode: 'cors',
+      credentials: 'include',
+    };
+
+    const response = await fetch(url, { ...defaultOptions, ...options });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return response;
+  };
+
+  // Use fetchWithAuth in other functions
+  const handleGenerateLogo = async () => {
+    try {
+      const response = await fetchWithAuth('http://localhost:5000/generate_logo', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
-        },
-        body: JSON.stringify({ 
-          companyName, 
-          sector, 
-          style, 
-          color: color.replace('#', '') // Ensure # is removed
+        body: JSON.stringify({
+          companyName,
+          sector,
+          style,
+          color: color.replace('#', '')
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Generated logo URL:', data.logo);
-        setGeneratedLogo(data.logo);
-      } else {
-        const errorData = await response.json();
-        console.error('Failed to generate logo:', errorData);
-      }
+      const data = await response.json();
+      setGeneratedLogo(data.logo);
+      loadSavedLogos();
     } catch (error) {
       console.error('Error generating logo:', error);
+      alert('Failed to generate logo. Please try again.');
+    }
+  };
+
+  const deleteLogo = async (logoId) => {
+    try {
+      const response = await fetchWithAuth(`http://localhost:5000/delete_logo/${logoId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        loadSavedLogos(); // Reload logos after deletion
+      } else {
+        console.error('Failed to delete logo');
+      }
+    } catch (error) {
+      console.error('Error deleting logo:', error);
+    }
+  };
+
+  const handleDownloadSpecificLogo = async (logo) => {
+    try {
+      setIsDownloading(true);
+      const imageResponse = await fetch(logo.image_url); // Changed from logo.url to logo.image_url
+      const imageBlob = await imageResponse.blob();
+      const url = window.URL.createObjectURL(imageBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${logo.company_name.replace(/\s+/g, '_')}_logo.png`; // Changed from logo.companyName to logo.company_name
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading logo:', error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -96,10 +176,67 @@ function CreateLogo() {
     }
   };
 
+  const StorageMenu = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-11/12 max-w-4xl max-h-[80vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Saved Logos</h2>
+          <button
+            onClick={() => setShowStorageMenu(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {savedLogos.map((logo) => (
+            <div key={logo.id} className="border rounded-lg p-4">
+              <img
+                src={logo.image_url}
+                alt={`Logo for ${logo.company_name}`}
+                className="w-full h-40 object-contain mb-2"
+              />
+              <div className="text-sm text-gray-600">
+                <p><strong>Company:</strong> {logo.company_name}</p>
+                <p><strong>Created:</strong> {new Date(logo.created_at).toLocaleDateString()}</p>
+                {logo.sector && <p><strong>Sector:</strong> {logo.sector}</p>}
+                {logo.style && <p><strong>Style:</strong> {logo.style}</p>}
+              </div>
+              <div className="flex justify-between mt-2">
+                <button
+                  onClick={() => handleDownloadSpecificLogo(logo)}
+                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                >
+                  Download
+                </button>
+                <button
+                  onClick={() => deleteLogo(logo.id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-gradient-to-r from-blue-400 to-blue-300 min-h-screen flex flex-col items-center justify-center">
       <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">AI Logo Generator</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-blue-600">AI Logo Generator</h1>
+          <button
+            onClick={() => setShowStorageMenu(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          >
+            Saved Logos
+          </button>
+        </div>
+        
         <p className="text-center text-gray-500 mb-4">{protectedMessage}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -200,6 +337,8 @@ function CreateLogo() {
             </select>
           </div>
         </div>
+        
+        {showStorageMenu && <StorageMenu />}
       </div>
     </div>
   );
