@@ -5,6 +5,7 @@ import logging
 import os
 from routes.auth import auth_bp
 from routes.logo import logo_bp
+from routes.image import image_bp
 
 load_dotenv()
 
@@ -33,6 +34,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(logo_bp)
+app.register_blueprint(image_bp)
 
 # Remove the @app.after_request decorator since CORS is handled by flask-cors
 # @app.after_request

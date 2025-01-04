@@ -58,6 +58,15 @@ class Logo(Base):
     image_url = Column(String, nullable=False)
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
+class Image(Base):
+    __tablename__ = 'images'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False)
+    prompt = Column(String, nullable=False)
+    style = Column(String)
+    image_url = Column(String, nullable=False)
+    created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
+
 def init_db():
     try:
         Base.metadata.create_all(bind=engine)
@@ -183,6 +192,58 @@ def delete_logo(logo_id, user_id):
     except Exception as e:
         session.rollback()
         logger.exception(f"Error deleting logo: {e}")
+        return False
+    finally:
+        session.close()
+
+def save_image(user_id, prompt, style, image_url):
+    session = SessionLocal()
+    try:
+        image = Image(
+            user_id=user_id,
+            prompt=prompt,
+            style=style,
+            image_url=image_url
+        )
+        session.add(image)
+        session.commit()
+        image_data = {
+            'id': image.id,
+            'image_url': image.image_url,
+            'prompt': image.prompt,
+            'created_at': image.created_at
+        }
+        return image_data
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Error saving image: {e}")
+        return None
+    finally:
+        session.close()
+
+def get_user_images(user_id):
+    session = SessionLocal()
+    try:
+        images = session.query(Image).filter(Image.user_id == user_id).all()
+        return images
+    except Exception as e:
+        logger.exception(f"Error fetching images: {e}")
+        return []
+    finally:
+        session.close()
+
+def delete_image(image_id, user_id):
+    session = SessionLocal()
+    try:
+        image = session.query(Image).filter(Image.id == image_id, Image.user_id == user_id).first()
+        if image:
+            session.delete(image)
+            session.commit()
+            return True
+        return False
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Error deleting image: {e}")
         return False
     finally:
         session.close()

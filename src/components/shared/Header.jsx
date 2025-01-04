@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 import { auth } from '../../utils/api';
 
-function Header({ onShowLogos }) {
+function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default value
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
   
@@ -70,7 +70,7 @@ function Header({ onShowLogos }) {
                   onClick={onShowLogos}
                   className="text-gray-600 hover:text-blue-600 px-4 py-2"
                 >
-                  Meus Logos
+                  {buttonText}  {/* Use the buttonText prop here */}
                 </button>
               )}
               <button
