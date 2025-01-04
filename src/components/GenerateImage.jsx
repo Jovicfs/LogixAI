@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react'; // Add useEffect import
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
@@ -12,6 +12,13 @@ function GenerateImage() {
   const [savedImages, setSavedImages] = useState([]);
   const [showGallery, setShowGallery] = useState(false);
   const { authState } = useContext(AuthContext);
+
+  // Add useEffect to load images when component mounts
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      loadSavedImages();
+    }
+  }, [authState.isAuthenticated]);
 
   const styles = [
     'Realistic', 'Artistic', 'Digital Art', 'Watercolor',
