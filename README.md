@@ -23,10 +23,9 @@ Para usar o LogixAl, visite nosso site em [link do site].
 3.  **Gere seu conteúdo:** A IA processará suas informações e gerará o conteúdo desejado.
 4.  **Edite e personalize:** Utilize as ferramentas de edição para ajustar e personalizar o resultado.
 
-## Tecnologias Utilizadas (Opcional - Adicione as tecnologias reais)
+## Tecnologias Utilizadas 
 
 *   [Framework/Linguagem de programação principal] (Python, JavaScript)
-*   [Bibliotecas de IA] (ex: TensorFlow, PyTorch)
 *   [Framework de front-end] (React)
 *   [Banco de dados] (PostgreSQL)
 *   [Serviços de nuvem] (Google Cloud)
