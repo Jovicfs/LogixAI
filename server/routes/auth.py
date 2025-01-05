@@ -44,19 +44,33 @@ def signup():
         if get_user_by_username(username):
             return jsonify({'errors': {'username': 'Username already exists'}}), 409
 
-        user = create_user(username, email, password)  # Create user handles hashing
-        if user is None: #verifica se o usuario foi criado
+        user = create_user(username, email, password)
+        if user is None:
             return jsonify({'errors': {'general': 'Error creating user'}}), 500
-        token = generate_token()
-        if update_user_token(username, token) is None: #verifica se o token foi atualizado
-            return jsonify({'errors': {'general': 'Error generating token'}}), 500
+
+        # Generate and set session token
+        session_token = secrets.token_urlsafe(32)
+        user = update_user_token(username, session_token)
+
+        response = make_response(jsonify({
+            'message': 'Signup successful',
+            'username': username
+        }))
+
+        # Set cookie with development settings
+        response.set_cookie(
+            'session',
+            session_token,
+            httponly=True,
+            secure=False,  # Development setting
+            samesite='Lax',
+            max_age=3600,
+            path='/'
+        )
 
         logger.info(f"User {username} signed up successfully")
-        return jsonify({
-            'message': 'Signup successful',
-            'token': token,
-            'username': username  # Add username to response
-        }), 201
+        return response, 201
+        
     except Exception as e:
         logger.exception(f"Error during signup: {e}")
         return jsonify({'errors': {'general': 'Internal server error'}}), 500
@@ -104,18 +118,42 @@ def logout():
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    email = data.get('email')
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
 
-    if get_user_by_username(username):
-        return jsonify({'error': 'Username already exists'}), 400
+        if get_user_by_username(username):
+            return jsonify({'error': 'Username already exists'}), 400
 
-    user = create_user(username, email, password)
-    if user:
-        return jsonify({'message': 'User created successfully'}), 201
-    return jsonify({'error': 'Error creating user'}), 500
+        user = create_user(username, email, password)
+        if user:
+            # Generate and set session token
+            session_token = secrets.token_urlsafe(32)
+            user = update_user_token(username, session_token)
+
+            response = make_response(jsonify({
+                'message': 'User created successfully',
+                'username': username
+            }))
+
+            # Modified cookie settings for development
+            response.set_cookie(
+                'session',
+                session_token,
+                httponly=True,
+                secure=False,  # Changed to False for development
+                samesite='Lax',
+                max_age=3600,
+                path='/'
+            )
+            return response, 201
+
+        return jsonify({'error': 'Error creating user'}), 500
+    except Exception as e:
+        logger.exception(f"Registration error: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @auth_bp.route('/protected', methods=['GET'])
 def protected():

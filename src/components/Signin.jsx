@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
 import { auth } from '../utils/api';
+import Toast from './shared/Toast';  // Adicione esta importação
+import LoadingSpinner from './shared/LoadingSpinner';
 
 function Signin() {
   const [formData, setFormData] = useState({
@@ -12,6 +14,8 @@ function Signin() {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -49,8 +53,15 @@ function Signin() {
     try {
       const response = await auth.login(formData);
       if (response.success) {
-        navigate('/');
-        window.location.reload();
+        setToastMessage('Login successful! Redirecting...');
+        setShowToast(true);
+        
+        // Delay the navigation
+        setTimeout(() => {
+          setShowToast(false); // Hide toast before navigating
+          navigate('/create-logo');
+          window.location.reload();
+        }, 2000);
       }
     } catch (error) {
       setErrors({
@@ -62,7 +73,14 @@ function Signin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type="success"
+          onClose={() => setShowToast(false)}
+        />
+      )}
       <Header isLoggedIn={false} />
       
       <main className="pt-24 pb-12">
@@ -132,7 +150,14 @@ function Signin() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <LoadingSpinner size="small" />
+                  <span className="ml-2">Signing in...</span>
+                </div>
+              ) : (
+                'Sign In'
+              )}
             </motion.button>
 
             <p className="text-center text-gray-600">

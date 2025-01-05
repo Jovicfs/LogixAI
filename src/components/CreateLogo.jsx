@@ -4,6 +4,7 @@ import Header from './shared/Header';
 import Footer from './shared/Footer';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
+import LoadingSpinner from './shared/LoadingSpinner';
 
 function CreateLogo() {
   const [companyName, setCompanyName] = useState('');
@@ -15,6 +16,7 @@ function CreateLogo() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [savedLogos, setSavedLogos] = useState([]);
   const [showStorageMenu, setShowStorageMenu] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -54,6 +56,7 @@ function CreateLogo() {
 
   const handleGenerateLogo = async () => {
     try {
+      setIsLoading(true);
       const response = await fetchWithCreds('/generate_logo', {
         method: 'POST',
         body: JSON.stringify({
@@ -69,6 +72,8 @@ function CreateLogo() {
       await loadSavedLogos();
     } catch (error) {
       console.error('Error generating logo:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -288,11 +293,19 @@ function CreateLogo() {
 
           <motion.button
             onClick={handleGenerateLogo}
+            disabled={isLoading}
             className="w-full bg-blue-600 text-white font-semibold py-4 rounded-lg hover:bg-blue-700 transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Gerar Logo
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <LoadingSpinner size="small" />
+                <span className="ml-2">Gerando Logo...</span>
+              </div>
+            ) : (
+              'Gerar Logo'
+            )}
           </motion.button>
 
           {/* Logo Preview */}
@@ -301,7 +314,12 @@ function CreateLogo() {
             animate={{ opacity: 1 }}
             className="mt-12"
           >
-            {generatedLogo ? (
+            {isLoading ? (
+              <div className="flex flex-col items-center space-y-4">
+                <LoadingSpinner size="large" />
+                <p className="text-gray-600">Gerando seu logo...</p>
+              </div>
+            ) : generatedLogo ? (
               <div className="space-y-6">
                 <img
                   src={generatedLogo}

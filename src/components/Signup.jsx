@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
+import Toast from './shared/Toast';  // Adicione esta importação
+import LoadingSpinner from './shared/LoadingSpinner';
 
 function Signup() {
     const [formData, setFormData] = useState({
@@ -13,6 +15,8 @@ function Signup() {
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -50,6 +54,7 @@ function Signup() {
             const response = await fetch('http://localhost:5000/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     username: formData.username,
                     email: formData.email,
@@ -60,9 +65,13 @@ function Signup() {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('username', data.username);
-                navigate('/');
+                setToastMessage('Registration successful! Redirecting...');
+                setShowToast(true);
+                
+                setTimeout(() => {
+                    setShowToast(false); // Hide toast before navigating
+                    navigate('/create-logo');
+                }, 2000);
             } else {
                 setErrors(data.errors || { general: 'Signup failed' });
             }
@@ -74,7 +83,14 @@ function Signup() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
+            {showToast && (
+                <Toast
+                    message={toastMessage}
+                    type="success"
+                    onClose={() => setShowToast(false)}
+                />
+            )}
             <Header isLoggedIn={false} />
             
             <main className="pt-24 pb-12">
@@ -142,7 +158,14 @@ function Signup() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
-                            {isLoading ? 'Creating Account...' : 'Create Account'}
+                            {isLoading ? (
+                                <div className="flex items-center justify-center">
+                                    <LoadingSpinner size="small" />
+                                    <span className="ml-2">Creating Account...</span>
+                                </div>
+                            ) : (
+                                'Create Account'
+                            )}
                         </motion.button>
 
                         <p className="text-center text-gray-600">
