@@ -183,7 +183,7 @@ function CreateImage() {
                 <LoadingSpinner size="large" />
                 <p className="text-gray-600">Creating your image...</p>
               </div>
-            ) : generatedImage ? (
+            ) : generatedImage ? (  
               <div className="space-y-6">
                 <img
                   src={generatedImage}
