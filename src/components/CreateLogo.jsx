@@ -5,6 +5,8 @@ import Footer from './shared/Footer';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import LoadingSpinner from './shared/LoadingSpinner';
+import withProtectedRoute from './shared/ProtectedRoute';
+import StorageModal from './shared/StorageModal';
 
 function CreateLogo() {
   const [companyName, setCompanyName] = useState('');
@@ -159,50 +161,18 @@ function CreateLogo() {
     navigate('/');
   };
 
-  const StorageMenu = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-11/12 max-w-4xl max-h-[80vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Saved Logos</h2>
-          <button
-            onClick={() => setShowStorageMenu(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {savedLogos.map((logo) => (
-            <div key={logo.id} className="border rounded-lg p-4">
-              <img
-                src={logo.image_url}
-                alt={`Logo for ${logo.company_name}`}
-                className="w-full h-40 object-contain mb-2"
-              />
-              <div className="text-sm text-gray-600">
-                <p><strong>Company:</strong> {logo.company_name}</p>
-                <p><strong>Created:</strong> {new Date(logo.created_at).toLocaleDateString()}</p>
-                {logo.sector && <p><strong>Sector:</strong> {logo.sector}</p>}
-                {logo.style && <p><strong>Style:</strong> {logo.style}</p>}
-              </div>
-              <div className="flex justify-between mt-2">
-                <button
-                  onClick={() => handleDownloadSpecificLogo(logo)}
-                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                >
-                  Download
-                </button>
-                <button
-                  onClick={() => deleteLogo(logo.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+  const logoItemRenderer = (logo) => (
+    <div className="space-y-2">
+      <img
+        src={logo.image_url}
+        alt={`Logo for ${logo.company_name}`}
+        className="w-full h-40 object-contain mb-2"
+      />
+      <div className="text-sm text-gray-600">
+        <p><strong>Company:</strong> {logo.company_name}</p>
+        <p><strong>Created:</strong> {new Date(logo.created_at).toLocaleDateString()}</p>
+        {logo.sector && <p><strong>Sector:</strong> {logo.sector}</p>}
+        {logo.style && <p><strong>Style:</strong> {logo.style}</p>}
       </div>
     </div>
   );
@@ -210,9 +180,8 @@ function CreateLogo() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
       <Header 
-        isLoggedIn={authState.isAuthenticated} 
-        username={authState.username}
         onShowLogos={() => setShowStorageMenu(true)}
+        buttonText="My Logos"
       />
       
       <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
@@ -345,12 +314,19 @@ function CreateLogo() {
         </motion.div>
       </main>
 
-      {/* Storage Menu Modal */}
-      {showStorageMenu && <StorageMenu />}
+      <StorageModal
+        isOpen={showStorageMenu}
+        onClose={() => setShowStorageMenu(false)}
+        items={savedLogos}
+        onDownload={handleDownloadSpecificLogo}
+        onDelete={deleteLogo}
+        title="Saved Logos"
+        itemRenderer={logoItemRenderer}
+      />
       
       <Footer />
     </div>
   );
 }
 
-export default CreateLogo;
+export default withProtectedRoute(CreateLogo);
