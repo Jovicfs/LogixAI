@@ -6,7 +6,7 @@ import os
 from routes.auth import auth_bp
 from routes.logo import logo_bp
 from routes.image import image_bp
-from routes.video import video_bp  # Add this import
+from routes.video import video_bp 
 
 load_dotenv()
 
@@ -16,7 +16,7 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax'
-)
+) 
 
 # Simplified CORS configuration
 CORS(app, supports_credentials=True, resources={
@@ -36,7 +36,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 app.register_blueprint(auth_bp)
 app.register_blueprint(logo_bp)
 app.register_blueprint(image_bp)
-app.register_blueprint(video_bp)  # Add this line
+app.register_blueprint(video_bp)  
 
 
 # Tratamento de erros
