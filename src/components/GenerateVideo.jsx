@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
+import LoadingSpinner from './shared/LoadingSpinner';
+import withProtectedRoute from './shared/ProtectedRoute';
+import StorageModal from './shared/StorageModal';
 
 function GenerateVideo() {
   const [prompt, setPrompt] = useState('');
@@ -9,44 +12,113 @@ function GenerateVideo() {
   const [style, setStyle] = useState('');
   const [generatedVideo, setGeneratedVideo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [showStorage, setShowStorage] = useState(false);
+  const [savedVideos, setSavedVideos] = useState([]);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const styles = ['Style1', 'Style2', 'Style3']; // Add your styles here
 
-  const styles = [
-    '3D Animation', 'Motion Graphics', 'Cartoon',
-    'Realistic', 'Abstract', 'Cinematic'
-  ];
+  useEffect(() => {
+    loadSavedVideos();
+  }, []);
+
+  const fetchWithCreds = async (url, options = {}) => {
+    const defaultOptions = {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      ...options
+    };
+
+    const response = await fetch(`http://localhost:5000${url}`, defaultOptions);
+    if (!response.ok) {
+      throw new Error('Request failed');
+    }
+    return response;
+  };
+
+  const loadSavedVideos = async () => {
+    try {
+      const response = await fetchWithCreds('/user_videos');
+      const data = await response.json();
+      setSavedVideos(data.videos || []);
+    } catch (error) {
+      console.error('Error loading videos:', error);
+    }
+  };
 
   const handleGenerateVideo = async () => {
+    if (!prompt) return;
+    
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:5000/generate_video', {
+      const response = await fetchWithCreds('/generate_video', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token'),
-        },
         body: JSON.stringify({ prompt, duration, style }),
       });
 
       const data = await response.json();
-      if (response.ok) {
-        setGeneratedVideo(data.video_url);
-      } else {
-        alert(data.error);
-      }
+      setGeneratedVideo(data.video_url);
+      await loadSavedVideos();
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to generate video');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleDownloadVideo = async (video) => {
+    try {
+      setIsDownloading(true);
+      const response = await fetchWithCreds(`/download_video/${video.id}`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `video_${video.id}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading video:', error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const deleteVideo = async (videoId) => {
+    try {
+      await fetchWithCreds(`/delete_video/${videoId}`, {
+        method: 'DELETE'
+      });
+      await loadSavedVideos();
+    } catch (error) {
+      console.error('Error deleting video:', error);
+    }
+  };
+
+  const videoItemRenderer = (video) => (
+    <div className="space-y-2">
+      <video
+        src={video.video_url}
+        className="w-full h-40 object-cover rounded-lg"
+        controls
+      />
+      <div className="text-sm text-gray-600">
+        <p><strong>Prompt:</strong> {video.prompt}</p>
+        <p><strong>Created:</strong> {new Date(video.created_at).toLocaleDateString()}</p>
+        {video.style && <p><strong>Style:</strong> {video.style}</p>}
+        {video.duration && <p><strong>Duration:</strong> {video.duration}s</p>}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
       <Header 
-        isLoggedIn={isLoggedIn} 
-        username={localStorage.getItem('username')}
+        onShowLogos={() => setShowStorage(true)}
+        buttonText="My Videos"
       />
       
       <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
@@ -130,21 +202,32 @@ function GenerateVideo() {
                 src={generatedVideo}
               />
               <motion.button
-                onClick={() => handleDownload(generatedVideo)}
+                onClick={() => handleDownloadVideo({ id: 'latest', video_url: generatedVideo })}
+                disabled={isDownloading}
                 className="mt-4 bg-green-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-green-700 transition-colors mx-auto block"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Download Video
+                {isDownloading ? 'Downloading...' : 'Download Video'}
               </motion.button>
             </motion.div>
           )}
         </motion.div>
       </main>
 
+      <StorageModal
+        isOpen={showStorage}
+        onClose={() => setShowStorage(false)}
+        items={savedVideos}
+        onDownload={handleDownloadVideo}
+        onDelete={deleteVideo}
+        title="Saved Videos"
+        itemRenderer={videoItemRenderer}
+      />
+
       <Footer />
     </div>
   );
 }
 
-export default GenerateVideo;
+export default withProtectedRoute(GenerateVideo);

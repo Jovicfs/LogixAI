@@ -6,6 +6,7 @@ import os
 from routes.auth import auth_bp
 from routes.logo import logo_bp
 from routes.image import image_bp
+from routes.video import video_bp  # Add this import
 
 load_dotenv()
 
@@ -20,10 +21,10 @@ app.config.update(
 # Simplified CORS configuration
 CORS(app, supports_credentials=True, resources={
         r"/*": {
-            "origins": ["http://localhost:5173"],  # Add your frontend URL
+            "origins": ["http://localhost:5173"], # FRONT END URL
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],  # Added Authorization
-            "expose_headers": ["Set-Cookie"],
+            "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],  # AUTHORIZATION
+            "expose_headers": ["Content-Range", "X-Content-Range"],
             "supports_credentials": True
         }
     })
@@ -35,17 +36,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 app.register_blueprint(auth_bp)
 app.register_blueprint(logo_bp)
 app.register_blueprint(image_bp)
+app.register_blueprint(video_bp)  # Add this line
 
-# Remove the @app.after_request decorator since CORS is handled by flask-cors
-# @app.after_request
-# def after_request(response):
-#     origin = request.headers.get('Origin')
-#     if origin in ["http://localhost:5173", "http://127.0.0.1:5173"]:
-#         response.headers.add('Access-Control-Allow-Origin', origin)
-#         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-#         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-#         response.headers.add('Access-Control-Allow-Credentials', 'true')
-#     return response
 
 # Tratamento de erros
 @app.errorhandler(404)

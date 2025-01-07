@@ -67,6 +67,16 @@ class Image(Base):
     image_url = Column(String, nullable=False)
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
+class Video(Base):
+    __tablename__ = 'videos'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False)
+    prompt = Column(String, nullable=False)
+    style = Column(String)
+    video_url = Column(String, nullable=False)
+    duration = Column(Integer)  # Duration in seconds
+    created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
+
 def init_db():
     try:
         Base.metadata.create_all(bind=engine)
@@ -244,6 +254,66 @@ def delete_image(image_id, user_id):
     except Exception as e:
         session.rollback()
         logger.exception(f"Error deleting image: {e}")
+        return False
+    finally:
+        session.close()
+
+def save_video(user_id, prompt, style, video_url, duration=None):
+    session = SessionLocal()
+    try:
+        video = Video(
+            user_id=user_id,
+            prompt=prompt,
+            style=style,
+            video_url=video_url,
+            duration=duration
+        )
+        session.add(video)
+        session.commit()
+        video_data = {
+            'id': video.id,
+            'video_url': video.video_url,
+            'prompt': video.prompt,
+            'created_at': video.created_at
+        }
+        return video_data
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Error saving video: {e}")
+        return None
+    finally:
+        session.close()
+
+def get_user_videos(user_id, video_id=None):
+    session = SessionLocal()
+    try:
+        if (video_id):
+            return session.query(Video).filter(
+                Video.user_id == user_id,
+                Video.id == video_id
+            ).first()
+        return session.query(Video).filter(Video.user_id == user_id).all()
+    except Exception as e:
+        logger.exception(f"Error fetching videos: {e}")
+        return [] if video_id is None else None
+    finally:
+        session.close()
+
+def delete_video(video_id, user_id):
+    session = SessionLocal()
+    try:
+        video = session.query(Video).filter(
+            Video.id == video_id,
+            Video.user_id == user_id
+        ).first()
+        if video:
+            session.delete(video)
+            session.commit()
+            return True
+        return False
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Error deleting video: {e}")
         return False
     finally:
         session.close()
