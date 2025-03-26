@@ -25,6 +25,10 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default va
       path: '/smart-edit'
     },
     {
+      title: 'Chat de IA',
+      path: '/ai-chat'
+    },
+    {
       title: 'Planos',
       path: '/pricing'
     }

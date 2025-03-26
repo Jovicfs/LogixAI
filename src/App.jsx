@@ -9,6 +9,7 @@ import CreateLogo from './components/CreateLogo';
 import GenerateImage from './components/GenerateImage';
 import GenerateVideo from './components/GenerateVideo';
 import SmartEdit from './components/SmartEdit';
+import AIChat from './components/AIChat';
 import { createContext, useState, useEffect } from 'react';
 import { auth } from './utils/api';
 
@@ -57,6 +58,7 @@ function App() {
                 <Route path='create-image' element={<GenerateImage/>}/>
                 <Route path='create-video' element={<GenerateVideo/>}/>
                 <Route path='smart-edit' element={<SmartEdit/>}/>
+                <Route path="/ai-chat" element={<AIChat />} />
             </Routes>
         </AuthContext.Provider>
     );
