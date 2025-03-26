@@ -10,7 +10,9 @@
     "server": "python ./server/app.py"
   },
   "dependencies": {
+    "fabric": "^5.3.0",
     "framer-motion": "^11.15.0",
+    "lucide-react": "^0.484.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.4.0",

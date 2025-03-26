@@ -1,169 +1,122 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { fabric } from 'fabric';
+import { Pencil, Square, Circle, Triangle, Type, Image, Trash } from 'lucide-react'; // Icon imports
 import Header from './shared/Header';
 import Footer from './shared/Footer';
+import withProtectedRoute from './shared/ProtectedRoute';
 
 function SmartEdit() {
-  const [image, setImage] = useState(null);
-  const [editedImage, setEditedImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [editType, setEditType] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const canvasRef = useRef(null);
+  const fabricCanvas = useRef(null);
+  const [activeObject, setActiveObject] = useState(null);
 
-  const editTypes = [
-    'Background Removal',
-    'Color Enhancement',
-    'Style Transfer',
-    'Resolution Upscaling',
-    'Object Removal',
-    'Image Restoration'
-  ];
+  useEffect(() => {
+    if (!canvasRef.current || fabricCanvas.current) return;
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+    fabricCanvas.current = new fabric.Canvas(canvasRef.current, {
+      width: 800,
+      height: 600,
+      backgroundColor: '#ffffff',
+    });
+
+    const canvas = fabricCanvas.current;
+
+    canvas.on('selection:created', (e) => setActiveObject(e.target));
+    canvas.on('selection:cleared', () => setActiveObject(null));
+
+    return () => {
+      canvas.dispose();
+      fabricCanvas.current = null;
+    };
+  }, []);
+
+  const addShape = (type) => {
+    const canvas = fabricCanvas.current;
+    if (!canvas) return;
+
+    let shape;
+    if (type === 'rectangle') {
+      shape = new fabric.Rect({ width: 100, height: 100, fill: '#ff0000', left: 100, top: 100 });
+    } else if (type === 'circle') {
+      shape = new fabric.Circle({ radius: 50, fill: '#00ff00', left: 100, top: 100 });
+    } else if (type === 'triangle') {
+      shape = new fabric.Triangle({ width: 100, height: 100, fill: '#0000ff', left: 100, top: 100 });
     }
+    canvas.add(shape);
+    canvas.setActiveObject(shape);
+    canvas.renderAll();
   };
 
-  const handleEdit = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch('http://localhost:5000/smart_edit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': localStorage.getItem('token'),
-        },
-        body: JSON.stringify({ 
-          image: image,
-          editType: editType 
-        }),
+  const addText = () => {
+    const canvas = fabricCanvas.current;
+    if (!canvas) return;
+
+    const text = new fabric.IText('Double click to edit', { left: 100, top: 100, fontSize: 20, fill: '#000000' });
+
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    canvas.renderAll();
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      fabric.Image.fromURL(event.target.result, (img) => {
+        img.scaleToWidth(200);
+        fabricCanvas.current.add(img);
+        fabricCanvas.current.renderAll();
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        setEditedImage(data.edited_image);
-      } else {
-        alert(data.error);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to edit image');
-    } finally {
-      setIsLoading(false);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
+  const deleteSelected = () => {
+    const canvas = fabricCanvas.current;
+    if (!canvas || !activeObject) return;
+
+    canvas.remove(activeObject);
+    setActiveObject(null);
+    canvas.renderAll();
+  };
+ 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
-      <Header 
-        isLoggedIn={isLoggedIn} 
-        username={localStorage.getItem('username')}
-      />
-      
-      <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8"
-        >
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Smart Edit</h1>
-            <p className="text-gray-600 mt-2">Enhance and transform your images with AI</p>
-          </div>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8 mt-16 flex">
+        {/* Sidebar Toolbar */}
+        <div className="flex flex-col items-center space-y-4 bg-white shadow-md rounded-lg p-2 fixed left-4 top-20">
+          <button onClick={() => addShape('triangle')} className="p-2 rounded-md hover:bg-gray-100">
+            <Triangle className="text-purple-600" size={24} />
+          </button>
+          <button onClick={() => addShape('rectangle')} className="p-2 rounded-md hover:bg-gray-100">
+            <Square className="text-yellow-600" size={24} />
+          </button>
+          <button onClick={() => addShape('circle')} className="p-2 rounded-md hover:bg-gray-100">
+            <Circle className="text-blue-500" size={24} />
+          </button>
+          <button onClick={addText} className="p-2 rounded-md hover:bg-gray-100">
+            <Type className="text-purple-500" size={24} />
+          </button>
+          <input type="file" accept="image/*" onChange={handleImageUpload} id="imageUpload" className="hidden" />
+          <label htmlFor="imageUpload" className="p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            <Image className="text-black" size={24} />
+          </label>
+          <button onClick={deleteSelected} disabled={!activeObject} className="p-2 rounded-md hover:bg-red-100">
+            <Trash className="text-red-500" size={24} />
+          </button>
+        </div>
 
-          <div className="space-y-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Upload Image
-              </label>
-              <input
-                type="file"
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Edit Type
-              </label>
-              <select
-                value={editType}
-                onChange={(e) => setEditType(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Select an edit type</option>
-                {editTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-
-            <motion.button
-              onClick={handleEdit}
-              disabled={isLoading || !image || !editType}
-              className="w-full bg-blue-600 text-white font-semibold py-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {isLoading ? 'Processing...' : 'Edit Image'}
-            </motion.button>
-          </div>
-
-          {/* Image Preview */}
-          {(image || editedImage) && (
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {image && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center"
-                >
-                  <h3 className="text-lg font-medium mb-2">Original</h3>
-                  <img
-                    src={image}
-                    alt="Original"
-                    className="max-w-full h-auto rounded-lg shadow-lg"
-                  />
-                </motion.div>
-              )}
-              {editedImage && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center"
-                >
-                  <h3 className="text-lg font-medium mb-2">Edited</h3>
-                  <img
-                    src={editedImage}
-                    alt="Edited"
-                    className="max-w-full h-auto rounded-lg shadow-lg"
-                  />
-                  <motion.button
-                    onClick={() => window.open(editedImage, '_blank')}
-                    className="mt-4 bg-green-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-green-700 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Download Edited Image
-                  </motion.button>
-                </motion.div>
-              )}
-            </div>
-          )}
-        </motion.div>
+        {/* Canvas Area */}
+        <div className="border border-gray-300 rounded-lg shadow-lg mx-auto">
+          <canvas ref={canvasRef} className="rounded-lg" />
+        </div>
       </main>
-
       <Footer />
     </div>
   );
 }
 
-export default SmartEdit;
+export default withProtectedRoute(SmartEdit);

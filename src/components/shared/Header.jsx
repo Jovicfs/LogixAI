@@ -21,7 +21,7 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default va
       path: '/create-image'
     },
     {
-      title: 'Edição Inteligente',
+      title: 'Editor de Imagens',
       path: '/smart-edit'
     },
     {
