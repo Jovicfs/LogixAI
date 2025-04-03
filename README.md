@@ -16,7 +16,7 @@ O LogixAl é uma plataforma online que utiliza inteligência artificial para sim
 
 ## Como Usar
 
-Para usar o LogixAl, visite nosso site em [link do site].
+Para usar o LogixAl, visite nosso site.
 
 1.  **Escolha a ferramenta:** Selecione a ferramenta desejada (Criação de Vídeos, Design de Logos, etc.).
 2.  **Insira suas informações:** Siga as instruções e insira as informações necessárias (texto, prompts, etc.).
