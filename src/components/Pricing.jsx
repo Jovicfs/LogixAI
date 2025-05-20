@@ -1,79 +1,124 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
+import { Check, AlertCircle } from 'lucide-react';
 
 function Pricing() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasValidPayment, setHasValidPayment] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
-    if (storedToken && storedUsername) {
-      setIsLoggedIn(true);
-      setUsername(storedUsername);
-    }
+    checkPaymentStatus();
   }, []);
 
-  const plans = [
-    {
-      name: 'Básico',
-      price: 'Grátis',
-      features: [
-        '3 Logos em baixa resolução',
-        'Uso não comercial',
-        'Suporte limitado',
-      ],
-    },
-    {
-      name: 'Padrão',
-      price: 'R$29,90',
-      features: [
-        '5 Logos em alta resolução',
-        'Uso comercial',
-        'Revisões ilimitadas',
-        'Suporte prioritário',
-      ],
-    },
-    {
-      name: 'Premium',
-      price: 'R$49,90',
-      features: [
-        'Logos ilimitados em alta resolução',
-        'Uso comercial completo',
-        'Arquivos vetoriais (SVG)',
-        'Suporte 24/7',
-        'Direitos exclusivos',
-      ],
-    },
-  ];
+  const checkPaymentStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/verify-status', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      setHasValidPayment(data.has_valid_payment);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+    }
+  };
+
+  const handlePayment = async (price) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/pagar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          price,
+          title: 'LogixAI Premium',
+          description: 'Access to all premium features'
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.init_point) {
+        window.location.href = data.init_point;
+      } else {
+        setError('Failed to initialize payment');
+      }
+    } catch (error) {
+      setError('Payment processing failed');
+      console.error('Payment error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
-      <Header isLoggedIn={isLoggedIn} username={username} />
-      
-      <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
-        <section id="pricing" className="h-full">
-          <h2 className="text-3xl font-bold text-center mb-8">Nossos Planos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-6 justify-center">
-                <h3 className="text-xl font-semibold mb-4">{plan.name}</h3>
-                <div className="text-2xl font-bold text-blue-500 mb-4">{plan.price}</div>
-                <ul className="list-disc pl-6 mb-4">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="mb-2">{feature}</li>
-                  ))}
-                </ul>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-                  Escolher Plano {plan.name}
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8 mt-16">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Acesso Premium</h1>
+          <p className="text-xl text-gray-600">Desbloqueie todo o potencial da IA</p>
+        </div>
 
+        {error && (
+          <div className="max-w-md mx-auto mb-8 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
+        <div className="max-w-md mx-auto">
+          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-8 text-white">
+            <h2 className="text-2xl font-bold mb-4">Acesso Total</h2>
+            <p className="opacity-90 mb-6">Todos os recursos em uma única assinatura</p>
+            <p className="text-4xl font-bold mb-6">R$5,00</p>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center">
+                <Check className="h-5 w-5 text-green-400 mr-2" />
+                Chat de IA Ilimitado
+              </li>
+              <li className="flex items-center">
+                <Check className="h-5 w-5 text-green-400 mr-2" />
+                Gerador de Logotipos
+              </li>
+              <li className="flex items-center">
+                <Check className="h-5 w-5 text-green-400 mr-2" />
+                Gerador de Imagens
+              </li>
+              <li className="flex items-center">
+                <Check className="h-5 w-5 text-green-400 mr-2" />
+                Suporte Premium
+              </li>
+            </ul>
+            {hasValidPayment ? (
+              <button 
+                className="w-full py-3 px-6 bg-green-500 text-white rounded-xl font-semibold"
+                disabled
+              >
+                Acesso Ativo
+              </button>
+            ) : (
+              <button 
+                onClick={() => handlePayment(5.00)}
+                disabled={loading}
+                className="w-full py-3 px-6 bg-white text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Processando...' : 'Acessar Agora'}
+              </button>
+            )}
+          </div>
+        </div>
+      </main>
       <Footer />
     </div>
   );

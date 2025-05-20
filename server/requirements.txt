@@ -8,3 +8,8 @@ Flask
     Flask-Cors
     mercadopago
     PyJWT
+
+
+
+
+
