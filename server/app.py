@@ -6,7 +6,8 @@ import os
 from routes.auth import auth_bp
 from routes.logo import logo_bp
 from routes.image import image_bp
-from routes.video import video_bp 
+from routes.payment import payment_bp
+from routes.mercado_pago_integration import create_preference
 
 load_dotenv()
 
@@ -36,7 +37,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 app.register_blueprint(auth_bp)
 app.register_blueprint(logo_bp)
 app.register_blueprint(image_bp)
-app.register_blueprint(video_bp)  
+app.register_blueprint(payment_bp)
 
 
 # Tratamento de erros

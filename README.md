@@ -5,11 +5,10 @@
 
 ## Descrição
 
-O LogixAl é uma plataforma online que utiliza inteligência artificial para simplificar a criação de conteúdo visual. Com o LogixAl, você pode gerar vídeos, logos, imagens e editar conteúdo de forma rápida e inteligente, sem a necessidade de habilidades técnicas avançadas.
+O LogixAl é uma plataforma online que utiliza inteligência artificial para simplificar a criação de conteúdo visual. Com o LogixAl, você pode gerar logos, imagens e editar conteúdo de forma rápida e inteligente, sem a necessidade de habilidades técnicas avançadas.
 
 ## Funcionalidades
 
-*   **Criação de Vídeos:** Gere animações e vídeos profissionais em minutos.
 *   **Design de Logos:** Crie identidades visuais únicas e personalizadas.
 *   **Geração de Imagens:** Transforme suas ideias em arte digital com o poder da IA.
 *   **Edição Inteligente:** Utilize ferramentas avançadas de edição com auxílio da IA.
@@ -18,7 +17,7 @@ O LogixAl é uma plataforma online que utiliza inteligência artificial para sim
 
 Para usar o LogixAl, visite nosso site.
 
-1.  **Escolha a ferramenta:** Selecione a ferramenta desejada (Criação de Vídeos, Design de Logos, etc.).
+1.  **Escolha a ferramenta:** Selecione a ferramenta desejada (Design de Logos, etc.).
 2.  **Insira suas informações:** Siga as instruções e insira as informações necessárias (texto, prompts, etc.).
 3.  **Gere seu conteúdo:** A IA processará suas informações e gerará o conteúdo desejado.
 4.  **Edite e personalize:** Utilize as ferramentas de edição para ajustar e personalizar o resultado.

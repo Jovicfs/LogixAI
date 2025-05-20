@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
 
+
 function HomePage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
@@ -19,12 +20,6 @@ function HomePage() {
 
     const features = [
         {
-            title: 'Criação de Vídeos',
-            description: 'Animações e vídeos profissionais em minutos.',
-            icon: '🎥',
-            path: '/create-video'
-        },
-        {
             title: 'Design de Logos',
             description: 'Identidade visual única e personalizada.',
             icon: '✨',
@@ -37,32 +32,34 @@ function HomePage() {
             path: '/create-image'
         },
         {
-            title: 'Edição Inteligente',
-            description: 'Ferramentas avançadas de edição com IA.',
-            icon: '⚡',
-            path: '/smart-edit' 
-        },
-        {
             title: 'Planos',
             description: 'Selecione o Plano que mais se encaixa com você!',
             icon: '📈',
             path: '/pricing'
         }
+        ,
+        {
+            title: 'Chat com IA',
+            description: 'Converse com nossa IA para obter insights e ideias.',
+            icon: '',
+            path: '/ai-chat'
+        }
     ];
 
     const testimonials = [
         {
-            name: 'João Silva',
-            role: 'Empreendedor',
-            comment: 'Revolucionou a forma como crio conteúdo para minha empresa.',
-            avatar: 'https://randomuser.me/api/portraits/men/1.jpg'
+            name: 'João Victor',
+            role: 'Fundador da StartUp',
+            comment: 'Aqui você encontra tudo que precisa para começar a criar conteúdo.',
+            avatar: 'https://randomuser.me/api/portraits/men/10.jpg'
         },
         // ...add more testimonials
     ];
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-            <Header isLoggedIn={isLoggedIn} username={username} />
+            <Header isLogg
+            edIn={isLoggedIn} username={username} />
             
             {/* Hero Section */}
             <section className="pt-32 pb-20 px-4">
@@ -73,7 +70,7 @@ function HomePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        Crie Conteúdo de Forma Rápida e{' '}
+                            Gere Conteúdo de Forma Rápida e{' '}
                         <span className="text-blue-600">Inteligente</span> com IA
                     </motion.h1>
                     
@@ -83,7 +80,7 @@ function HomePage() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
                     >
-                        Gere vídeos, logos e imagens incríveis em minutos. Sem necessidade de habilidades técnicas.
+                        Gere Posts, logos e imagens em minutos. Ideal para criadores de conteúdo.
                     </motion.p>
 
                     <div className="flex justify-center space-x-4">
@@ -128,7 +125,26 @@ function HomePage() {
                 </div>
             </section>
 
-            {/* Testimonials */}
+
+
+
+          {/* Post Generator Section */}
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-4 text-center">
+                    <h2 className="text-3xl font-bold mb-8">Crie Posts com Facilidade</h2>
+                    <p className="text-gray-600 mb-8">
+                        Utilize nossa ferramenta de geração de posts para criar conteúdo envolvente em minutos.
+                    </p>
+                    <Link
+                        to="/post-generator"
+                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                        Experimente o Gerador de Posts
+                    </Link>
+                </div>
+            </section>
+
+   {/* Testimonials */}
             <section className="py-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-12">O Que Dizem Nossos Usuários</h2>
@@ -159,6 +175,7 @@ function HomePage() {
                 </div>
             </section>
 
+           
             <Footer />
         </div>
     );

@@ -1,12 +1,13 @@
 import logging
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, String, Text, text
+from sqlalchemy import create_engine, Column, Integer, String, Text, Float, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+import uuid
 
 # Configuração do Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -17,6 +18,9 @@ load_dotenv()
 
 # Configurações do banco de dados
 DATABASE_URL = os.getenv('DATABASE_URL')
+if not DATABASE_URL:
+    logger.error("DATABASE_URL not found in environment variables")
+    raise ValueError("DATABASE_URL is required")
 
 try:
     engine = create_engine(DATABASE_URL)
@@ -67,15 +71,15 @@ class Image(Base):
     image_url = Column(String, nullable=False)
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
-class Video(Base):
-    __tablename__ = 'videos'
+class Payment(Base):
+    __tablename__ = 'payments'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
-    prompt = Column(String, nullable=False)
-    style = Column(String)
-    video_url = Column(String, nullable=False)
-    duration = Column(Integer)  # Duration in seconds
+    amount = Column(Float, nullable=False)
+    status = Column(String, nullable=False, default='pending')
+    external_reference = Column(String, unique=True)
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
+    updated_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
 def init_db():
     try:
@@ -258,63 +262,80 @@ def delete_image(image_id, user_id):
     finally:
         session.close()
 
-def save_video(user_id, prompt, style, video_url, duration=None):
+def create_payment(user_id, amount):
     session = SessionLocal()
     try:
-        video = Video(
+        payment = Payment(
             user_id=user_id,
-            prompt=prompt,
-            style=style,
-            video_url=video_url,
-            duration=duration
+            amount=amount,
+            external_reference=str(uuid.uuid4())
         )
-        session.add(video)
+        session.add(payment)
         session.commit()
-        video_data = {
-            'id': video.id,
-            'video_url': video.video_url,
-            'prompt': video.prompt,
-            'created_at': video.created_at
+        return {
+            'id': payment.id,
+            'amount': payment.amount,
+            'status': payment.status,
+            'external_reference': payment.external_reference
         }
-        return video_data
     except Exception as e:
         session.rollback()
-        logger.exception(f"Error saving video: {e}")
+        logger.exception(f"Error creating payment: {e}")
         return None
     finally:
         session.close()
 
-def get_user_videos(user_id, video_id=None):
+def update_payment_status(external_reference, status):
     session = SessionLocal()
     try:
-        if (video_id):
-            return session.query(Video).filter(
-                Video.user_id == user_id,
-                Video.id == video_id
-            ).first()
-        return session.query(Video).filter(Video.user_id == user_id).all()
-    except Exception as e:
-        logger.exception(f"Error fetching videos: {e}")
-        return [] if video_id is None else None
-    finally:
-        session.close()
-
-def delete_video(video_id, user_id):
-    session = SessionLocal()
-    try:
-        video = session.query(Video).filter(
-            Video.id == video_id,
-            Video.user_id == user_id
+        payment = session.query(Payment).filter(
+            Payment.external_reference == external_reference
         ).first()
-        if video:
-            session.delete(video)
+        if payment:
+            payment.status = status
+            payment.updated_at = datetime.utcnow().isoformat()
             session.commit()
             return True
         return False
     except Exception as e:
         session.rollback()
-        logger.exception(f"Error deleting video: {e}")
+        logger.exception(f"Error updating payment status: {e}")
         return False
+    finally:
+        session.close()
+
+def get_user_payment_status(user_id):
+    session = SessionLocal()
+    try:
+        payment = session.query(Payment).filter(
+            Payment.user_id == user_id,
+            Payment.status == 'approved'
+        ).first()
+        return payment is not None
+    except Exception as e:
+        logger.exception(f"Error checking payment status: {e}")
+        return False
+    finally:
+        session.close()
+
+def get_payment_by_reference(external_reference):
+    session = SessionLocal()
+    try:
+        payment = session.query(Payment).filter(
+            Payment.external_reference == external_reference
+        ).first()
+        if payment:
+            return {
+                'id': payment.id,
+                'user_id': payment.user_id,
+                'amount': payment.amount,
+                'status': payment.status,
+                'created_at': payment.created_at
+            }
+        return None
+    except Exception as e:
+        logger.exception(f"Error fetching payment: {e}")
+        return None
     finally:
         session.close()
 

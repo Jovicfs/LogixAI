@@ -9,23 +9,19 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default va
   
   const features = [
     {
-      title: 'Criação de Vídeos',
-      path: '/create-video'
-    },
-    {
-      title: 'Design de Logos',
+      title: 'Gerar Logo',
       path: '/create-logo'
     },
     {
-      title: 'Geração de Imagens',
+      title: 'Gerar Post',  
+      path: '/post-generator'
+    },
+    {
+      title: 'Gerar Imagem',
       path: '/create-image'
     },
     {
-      title: 'Editor de Imagens',
-      path: '/smart-edit'
-    },
-    {
-      title: 'Chat de IA',
+      title: 'Chat com IA',
       path: '/ai-chat'
     },
     {

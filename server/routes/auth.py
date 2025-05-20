@@ -62,7 +62,7 @@ def signup():
             'session',
             session_token,
             httponly=True,
-            secure=False,  # Development setting
+            secure=False,  # Development setting False, Production True                 
             samesite='Lax',
             max_age=3600,
             path='/'

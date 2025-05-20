@@ -3,3 +3,8 @@ Flask
     SQLAlchemy
     Werkzeug
     psycopg2-binary
+    openai
+    requests
+    Flask-Cors
+    mercadopago
+    PyJWT
