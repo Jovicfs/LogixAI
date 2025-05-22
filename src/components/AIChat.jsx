@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Image as ImageIcon, History, Menu, X } from 'lucide-react';
+import { Send, Image as ImageIcon, History, Menu, X, PlusCircle } from 'lucide-react'; // Adicione PlusCircle
 import withProtectedRoute from './shared/ProtectedRoute';
 import Header from './shared/Header';
 
 function AIChat() {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]); // Array de mensagens da conversa ATUAL
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([]); // Array de CONVERSAS
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState(null); // Novo estado para o ID da conversa atual
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -29,7 +30,7 @@ function AIChat() {
       });
       const data = await res.json();
       if (res.ok) {
-        setHistory(data.history);
+        setHistory(data.history); // data.history agora é um array de CONVERSAS
       } else {
         setError(data.error || 'Erro ao buscar histórico');
       }
@@ -39,11 +40,15 @@ function AIChat() {
     }
   };
 
-  const handleHistoryClick = (item) => {
-    // Exibe só aquela mensagem no chat
-    setMessages([
-      { role: item.role, content: item.content },
-    ]);
+  // Alterado para receber a conversa completa
+  const handleHistoryClick = (conversation) => {
+    // conversation é um objeto: { id: "...", messages: [...] }
+    setMessages(conversation.messages); // Exibe TODAS as mensagens da conversa clicada
+    setCurrentConversationId(conversation.id); // Define o ID da conversa atual
+    setIsSidebarOpen(false); // Fecha a sidebar em mobile para melhor UX
+    setMessage(''); // Limpa o input ao carregar conversa
+    setSelectedImage(null); // Limpa imagem selecionada
+    setError(''); // Limpa qualquer erro anterior
   };
 
   const handleImageSelect = (e) => {
@@ -60,10 +65,24 @@ function AIChat() {
     setIsLoading(true);
     setError('');
 
+    // Create temporary user message with local image URL
+    const userMessage = { 
+      role: 'user', 
+      content: message,
+      image_path: selectedImage ? URL.createObjectURL(selectedImage) : null,
+      created_at: new Date().toISOString()
+    };
+    
+    // Add message to UI immediately
+    setMessages(prev => [...prev, userMessage]);
+
     try {
       const formData = new FormData();
       formData.append('prompt', message);
       if (selectedImage) formData.append('image', selectedImage);
+      if (currentConversationId) {
+        formData.append('conversation_id', currentConversationId);
+      }
 
       const res = await fetch('http://localhost:5000/chat/chat', {
         method: 'POST',
@@ -74,20 +93,60 @@ function AIChat() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro no chat');
 
-      const newMessages = [
-        { role: 'user', content: message, image: selectedImage ? URL.createObjectURL(selectedImage) : null },
-        { role: 'assistant', content: data.response, meta: { model: data.model, ms: data.duration_ms } }
-      ];
+      // Update conversation ID from response
+      if (data.conversation_id) {
+        setCurrentConversationId(data.conversation_id);
+        
+        // Update the temporary user message with server data
+        setMessages(prev => prev.map(msg => 
+          msg === userMessage ? {
+            ...msg,
+            image_path: data.image_path || msg.image_path // Keep local URL if no server path
+          } : msg
+        ));
+      }
 
-      setMessages(prev => [...prev, ...newMessages]);
+      // Add AI response
+      const assistantMessage = { 
+        role: 'assistant', 
+        content: data.response,
+        created_at: new Date().toISOString(),
+        meta: { 
+          model: data.model, 
+          ms: data.duration_ms 
+        }
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+
+      // Clear input and image
       setMessage('');
       setSelectedImage(null);
-      fetchChatHistory(); // Atualiza histórico
+      
+      // Fetch updated history
+      await fetchChatHistory();
     } catch (err) {
       setError(err.message);
+      // Remove the temporary message on error
+      setMessages(prev => prev.filter(msg => msg !== userMessage));
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Update image rendering in the message list
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('blob:')) return imagePath;
+    return `http://localhost:5000/chat/uploads/${imagePath.split('/').pop()}`;
+  };
+
+  const startNewConversation = () => {
+    setMessages([]); // Limpa as mensagens exibidas
+    setCurrentConversationId(null); // Reseta o ID da conversa para iniciar uma nova
+    setIsSidebarOpen(false); // Fecha a sidebar em mobile
+    setMessage(''); // Limpa o input
+    setSelectedImage(null); // Limpa imagem selecionada
+    setError(''); // Limpa qualquer erro anterior
   };
 
   return (
@@ -116,28 +175,49 @@ function AIChat() {
             bg-gray-50 border-r rounded-r-xl md:rounded-xl
             overflow-y-auto shadow-lg md:shadow-sm
             mt-16 md:mt-0
+            flex flex-col
           `}
         >
           <div className="p-4 border-b flex items-center gap-2 font-semibold text-gray-700">
             <History size={20} />
             Histórico
           </div>
-          <div className="p-4 space-y-2">
+          <div className="flex-1 p-4 space-y-2 overflow-y-auto"> {/* Adicionado flex-1 e overflow */}
             {history.length === 0 && (
               <p className="text-gray-400 text-sm">Nenhuma conversa salva.</p>
             )}
-            {history.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => handleHistoryClick(item)}
-                className="block w-full text-left p-2 bg-white hover:bg-gray-100 text-sm rounded-lg border text-gray-700 truncate"
-                title={item.content}
-              >
-                {item.role === 'user' ? '🧑 ' : '🤖 '}
-                {item.content.slice(0, 50)}
-              </button>
-            ))}
+            {history.map((conversation, index) => { // 'conversation' é um objeto { id: "...", messages: [...] }
+              // Encontre a primeira mensagem do usuário para usar como título
+              const firstUserMessage = conversation.messages.find(msg => msg.role === 'user');
+              const title = firstUserMessage ? firstUserMessage.content : 'Nova Conversa';
+
+              // Destaque a conversa atual na sidebar
+              const isSelected = conversation.id === currentConversationId;
+
+              return (
+                <button
+                  key={conversation.id || index} // Use o ID da conversa como key
+                  onClick={() => handleHistoryClick(conversation)}
+                  className={`
+                    block w-full text-left p-2 border rounded-lg text-sm truncate
+                    ${isSelected ? 'bg-blue-100 border-blue-300 text-blue-800 font-semibold' : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-200'}
+                  `}
+                  title={title}
+                >
+                  {firstUserMessage ? '🧑 ' : ''} 
+                  {title.slice(0, 50)}{title.length > 50 ? '...' : ''}
+                </button>
+              );
+            })}
           </div>
+          <div className="p-4 border-t"> {/* Botão de nova conversa no final da sidebar */}
+                <button
+                    onClick={startNewConversation}
+                    className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                >
+                    <PlusCircle size={18} /> Nova Conversa
+                </button>
+            </div>
         </aside>
 
         {/* Overlay for mobile */}
@@ -165,7 +245,18 @@ function AIChat() {
                       : 'bg-white text-gray-800 border rounded-bl-none'
                   }`}
                 >
-                  {msg.image && <img src={msg.image} alt="Preview" className="mb-2 rounded-lg" />}
+                  {/* Exibe a imagem se houver um image_path */}
+                  {msg.image_path && (
+                    <img
+                      src={getImageUrl(msg.image_path)}
+                      alt="Anexo"
+                      className="mb-2 rounded-lg max-h-48 object-contain"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  )}
                   {msg.content}
                   {msg.role === 'assistant' && msg.meta && (
                     <div className="mt-2 text-[10px] text-gray-400">
@@ -227,7 +318,17 @@ function AIChat() {
               <div className="text-xs sm:text-sm text-gray-500 mt-2 flex items-center gap-2 px-2">
                 <ImageIcon size={16} />
                 <span className="truncate">{selectedImage.name}</span>
+                <button
+                    type="button"
+                    onClick={() => setSelectedImage(null)}
+                    className="ml-auto text-red-500 hover:text-red-700"
+                >
+                    <X size={16} />
+                </button>
               </div>
+            )}
+            {error && (
+                <div className="text-red-500 text-xs mt-2 text-center">{error}</div>
             )}
           </form>
         </div>
@@ -235,5 +336,5 @@ function AIChat() {
     </div>
   );
 }
-
+  
 export default withProtectedRoute(AIChat);

@@ -39,6 +39,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class User(Base):
     __tablename__ = 'users'
+
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
@@ -53,6 +54,7 @@ class User(Base):
 
 class Logo(Base):
     __tablename__ = 'logos'
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
     company_name = Column(String, nullable=False)
@@ -64,6 +66,7 @@ class Logo(Base):
 
 class Image(Base):
     __tablename__ = 'images'
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
     prompt = Column(String, nullable=False)
@@ -73,6 +76,7 @@ class Image(Base):
 
 class Payment(Base):
     __tablename__ = 'payments'
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
     amount = Column(Float, nullable=False)
@@ -83,10 +87,13 @@ class Payment(Base):
 
 class ChatMessage(Base):
     __tablename__ = 'chat_messages'
+
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
+    conversation_id = Column(String(36), default=lambda: str(uuid.uuid4()), nullable=False)
     role = Column(String, nullable=False)  # "user" ou "assistant"
     content = Column(Text, nullable=False)
+    image_path = Column(String(255), nullable=True)
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
 def init_db():
@@ -326,8 +333,6 @@ def get_user_payment_status(user_id):
     finally:
         session.close()
 
-
-
 def get_payment_by_reference(external_reference):
     session = SessionLocal()
     try:
@@ -349,48 +354,90 @@ def get_payment_by_reference(external_reference):
     finally:
         session.close()
 
-def save_chat_message(user_id, role, content):
+def save_chat_message(user_id, role, content, **kwargs):
     session = SessionLocal()
     try:
+        if not isinstance(user_id, int):
+            raise ValueError(f"Invalid user_id type: {type(user_id)}")
+        
+        if not content:
+            raise ValueError("Content cannot be empty")
+            
+        if role not in ['user', 'assistant']:
+            raise ValueError(f"Invalid role: {role}")
+
+        conversation_id = kwargs.get('conversation_id')
+        if not conversation_id:
+            conversation_id = str(uuid.uuid4())
+        elif not isinstance(conversation_id, str):
+            conversation_id = str(conversation_id)
+
+        logger.debug(f"Creating ChatMessage: user_id={user_id}, role={role}, conv_id={conversation_id}")
+        
         message = ChatMessage(
             user_id=user_id,
             role=role,
-            content=content
+            content=content,
+            conversation_id=conversation_id,
+            image_path=kwargs.get('image_path')
         )
+        
         session.add(message)
+        session.flush()  # Flush to get the ID without committing
+        logger.debug(f"Message flushed with ID: {message.id}")
+        
         session.commit()
+        logger.info(f"Message committed successfully: id={message.id}")
+
         return {
             'id': message.id,
+            'conversation_id': message.conversation_id,
             'role': message.role,
             'content': message.content,
+            'image_path': message.image_path,
             'created_at': message.created_at
         }
+        
     except Exception as e:
         session.rollback()
-        logger.exception(f"Erro ao salvar mensagem de chat: {e}")
-        return None
+        logger.exception(f"Error in save_chat_message: {str(e)}")
+        raise
     finally:
         session.close()
-        
-def get_chat_history(user_id, limit=20):
+
+def get_chat_history(user_id):
     session = SessionLocal()
     try:
-        messages = session.query(ChatMessage)\
+        # Get unique conversation IDs
+        conversations = session.query(ChatMessage.conversation_id)\
             .filter(ChatMessage.user_id == user_id)\
-            .order_by(ChatMessage.created_at.desc())\
-            .limit(limit)\
+            .distinct()\
             .all()
-        return [{
-            'role': msg.role,
-            'content': msg.content,
-            'created_at': msg.created_at
-        } for msg in reversed(messages)]
+
+        history = []
+        for (conv_id,) in conversations:
+            messages = session.query(ChatMessage)\
+                .filter(
+                    ChatMessage.user_id == user_id,
+                    ChatMessage.conversation_id == conv_id
+                )\
+                .order_by(ChatMessage.created_at.asc())\
+                .all()
+            if messages:
+                history.append({
+                    'id': conv_id,
+                    'messages': [{
+                        'role': msg.role,
+                        'content': msg.content,
+                        'image_path': msg.image_path,
+                        'created_at': msg.created_at
+                    } for msg in messages]
+                })
+        return history
     except Exception as e:
-        logger.exception(f"Erro ao buscar histórico de chat: {e}")
+        logger.exception(f"Error fetching chat history: {e}")
         return []
     finally:
         session.close()
-      
-     
 
 init_db()

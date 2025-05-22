@@ -1,13 +1,5 @@
-Flask
-python-dotenv
-SQLAlchemy
-Werkzeug
-psycopg2-binary
-openai
-requests
-Flask-Cors
-mercadopago
+flask
+flask-cors
 PyJWT
-pytrends
-transformers
-torch
+werkzeug
+python-dotenv

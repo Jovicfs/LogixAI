@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Header from "./Header";
-import Footer from "./Footer";
+
 import LoadingSpinner from "./LoadingSpinner";
 import withProtectedRoute from "./ProtectedRoute";
 
@@ -118,7 +118,6 @@ function PostGenerator() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
