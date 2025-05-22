@@ -32,16 +32,16 @@ function HomePage() {
             path: '/create-image'
         },
         {
-            title: 'Planos',
-            description: 'Selecione o Plano que mais se encaixa com você!',
-            icon: '📈',
+            title: 'Preço',
+            description: 'Efetue o pagamento para ter acesso as nossas ferramentas!',
+            icon: '💳',
             path: '/pricing'
         }
         ,
         {
             title: 'Chat com IA',
             description: 'Converse com nossa IA para obter insights e ideias.',
-            icon: '',
+            icon: '💬',
             path: '/ai-chat'
         }
     ];

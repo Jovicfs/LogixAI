@@ -1,15 +1,13 @@
 Flask
-    python-dotenv
-    SQLAlchemy
-    Werkzeug
-    psycopg2-binary
-    openai
-    requests
-    Flask-Cors
-    mercadopago
-    PyJWT
-
-
-
-
-
+python-dotenv
+SQLAlchemy
+Werkzeug
+psycopg2-binary
+openai
+requests
+Flask-Cors
+mercadopago
+PyJWT
+pytrends
+transformers
+torch

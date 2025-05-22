@@ -81,6 +81,14 @@ class Payment(Base):
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
     updated_at = Column(String, default=lambda: datetime.utcnow().isoformat())
 
+class ChatMessage(Base):
+    __tablename__ = 'chat_messages'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False)
+    role = Column(String, nullable=False)  # "user" ou "assistant"
+    content = Column(Text, nullable=False)
+    created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
+
 def init_db():
     try:
         Base.metadata.create_all(bind=engine)
@@ -318,6 +326,8 @@ def get_user_payment_status(user_id):
     finally:
         session.close()
 
+
+
 def get_payment_by_reference(external_reference):
     session = SessionLocal()
     try:
@@ -338,5 +348,49 @@ def get_payment_by_reference(external_reference):
         return None
     finally:
         session.close()
+
+def save_chat_message(user_id, role, content):
+    session = SessionLocal()
+    try:
+        message = ChatMessage(
+            user_id=user_id,
+            role=role,
+            content=content
+        )
+        session.add(message)
+        session.commit()
+        return {
+            'id': message.id,
+            'role': message.role,
+            'content': message.content,
+            'created_at': message.created_at
+        }
+    except Exception as e:
+        session.rollback()
+        logger.exception(f"Erro ao salvar mensagem de chat: {e}")
+        return None
+    finally:
+        session.close()
+        
+def get_chat_history(user_id, limit=20):
+    session = SessionLocal()
+    try:
+        messages = session.query(ChatMessage)\
+            .filter(ChatMessage.user_id == user_id)\
+            .order_by(ChatMessage.created_at.desc())\
+            .limit(limit)\
+            .all()
+        return [{
+            'role': msg.role,
+            'content': msg.content,
+            'created_at': msg.created_at
+        } for msg in reversed(messages)]
+    except Exception as e:
+        logger.exception(f"Erro ao buscar histórico de chat: {e}")
+        return []
+    finally:
+        session.close()
+      
+     
 
 init_db()

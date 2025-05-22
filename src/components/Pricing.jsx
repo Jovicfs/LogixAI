@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './shared/Header';
-import Footer from './shared/Footer';
+// Removed Footer import
 import { Check, AlertCircle } from 'lucide-react';
 
 function Pricing() {
@@ -119,7 +119,7 @@ function Pricing() {
           </div>
         </div>
       </main>
-      <Footer />
+      {/* Footer component removed */}
     </div>
   );
 }

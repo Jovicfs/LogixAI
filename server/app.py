@@ -7,6 +7,9 @@ from routes.auth import auth_bp
 from routes.logo import logo_bp
 from routes.image import image_bp
 from routes.payment import payment_bp
+from routes.trends import trends_bp
+from routes.post_ideas import post_bp
+from routes.chat import chat_bp
 from routes.mercado_pago_integration import create_preference
 
 load_dotenv()
@@ -38,6 +41,9 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(logo_bp)
 app.register_blueprint(image_bp)
 app.register_blueprint(payment_bp)
+app.register_blueprint(trends_bp)
+app.register_blueprint(post_bp)
+app.register_blueprint(chat_bp)
 
 
 # Tratamento de erros

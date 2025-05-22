@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
-import Footer from './shared/Footer';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import LoadingSpinner from './shared/LoadingSpinner';
@@ -323,8 +322,6 @@ function CreateLogo() {
         title="Saved Logos"
         itemRenderer={logoItemRenderer}
       />
-      
-      <Footer />
     </div>
   );
 }

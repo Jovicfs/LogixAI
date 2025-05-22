@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
-import Footer from './shared/Footer';
 import { auth } from '../utils/api';
 import Toast from './shared/Toast';  // Adicione esta importação
 import LoadingSpinner from './shared/LoadingSpinner';
@@ -169,8 +168,6 @@ function Signin() {
           </form>
         </motion.div>
       </main>
-
-      <Footer />
     </div>
   );
 }

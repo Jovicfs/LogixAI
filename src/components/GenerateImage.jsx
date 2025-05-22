@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
-import Footer from './shared/Footer';
 import LoadingSpinner from './shared/LoadingSpinner';
 import withProtectedRoute from './shared/ProtectedRoute';
 import StorageModal from './shared/StorageModal';
@@ -218,8 +217,6 @@ function CreateImage() {
         title="Saved Images"
         itemRenderer={imageItemRenderer}
       />
-
-      <Footer />
     </div>
   );
 }

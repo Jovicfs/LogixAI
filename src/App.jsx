@@ -7,7 +7,6 @@ import Pricing from './components/pricing';
 import About from './components/about';
 import CreateLogo from './components/CreateLogo';
 import GenerateImage from './components/GenerateImage';
-import SmartEdit from './components/SmartEdit';
 import AIChat from './components/AIChat';
 import PostGenerator from './components/shared/PostGenerator';
 import { createContext, useState, useEffect } from 'react';
@@ -56,7 +55,6 @@ function App() {
                 <Route path='/about' element={<About/>}/>
                 <Route path='create-logo' element={<CreateLogo/>}/>
                 <Route path='create-image' element={<GenerateImage/>}/>
-                <Route path='smart-edit' element={<SmartEdit/>}/>
                 <Route path="/ai-chat" element={<AIChat />} />
                 <Route path="/post-generator" element={<PostGenerator />} />
             </Routes>
