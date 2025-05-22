@@ -40,6 +40,7 @@ def create_preference(title, description, price, external_reference):
             "auto_return": "approved"
         }
 
+
         preference_response = sdk.preference().create(preference_data)
         return preference_response["response"]
     except Exception as e:

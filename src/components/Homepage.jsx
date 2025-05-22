@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
-
+import DesignServicesIcon from '@mui/icons-material/DesignServices';
+import ImageIcon from '@mui/icons-material/Image';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import ChatIcon from '@mui/icons-material/Chat';
 
 function HomePage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,32 +22,31 @@ function HomePage() {
     }, []);
 
     const features = [
-        {
-            title: 'Design de Logos',
-            description: 'Identidade visual única e personalizada.',
-            icon: '✨',
-            path: '/create-logo'
-        },
-        {
-            title: 'Geração de Imagens',
-            description: 'Transforme ideias em arte digital com IA.',
-            icon: '🎨',
-            path: '/create-image'
-        },
-        {
-            title: 'Preço',
-            description: 'Efetue o pagamento para ter acesso as nossas ferramentas!',
-            icon: '💳',
-            path: '/pricing'
-        }
-        ,
-        {
-            title: 'Chat com IA',
-            description: 'Converse com nossa IA para obter insights e ideias.',
-            icon: '💬',
-            path: '/ai-chat'
-        }
-    ];
+    {
+        title: 'Design de Logos',
+        description: 'Identidade visual única e personalizada.',
+        icon: <DesignServicesIcon fontSize="large" className="text-blue-600" />,
+        path: '/create-logo'
+    },
+    {
+        title: 'Geração de Imagens',
+        description: 'Transforme ideias em arte digital com IA.',
+        icon: <ImageIcon fontSize="large" className="text-green-600" />,
+        path: '/create-image'
+    },
+    {
+        title: 'Preço',
+        description: 'Efetue o pagamento para ter acesso às nossas ferramentas!',
+        icon: <PaymentsIcon fontSize="large" className="text-yellow-600" />,
+        path: '/pricing'
+    },
+    {
+        title: 'Chat com IA',
+        description: 'Converse com nossa IA para obter insights e ideias.',
+        icon: <ChatIcon fontSize="large" className="text-purple-600" />,
+        path: '/ai-chat'
+    }
+];
 
     const testimonials = [
         {
@@ -62,73 +64,67 @@ function HomePage() {
             edIn={isLoggedIn} username={username} />
             
             {/* Hero Section */}
-            <section className="pt-32 pb-20 px-4">
-                <div className="container mx-auto text-center">
-                    <motion.h1 
-                        className="text-5xl md:text-6xl font-bold text-gray-900 mb-6"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                            Gere Conteúdo de Forma Rápida e{' '}
-                        <span className="text-blue-600">Inteligente</span> com IA
-                    </motion.h1>
-                    
-                    <motion.p 
-                        className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                    >
-                        Gere Posts, logos e imagens em minutos. Ideal para criadores de conteúdo.
-                    </motion.p>
-
-                    <div className="flex justify-center space-x-4">
-                        <Link
-                            to="/sign-up"
-                            className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors"
-                        >
-                            Experimente Gratuitamente
-                        </Link>
-                        <button className="bg-gray-100 text-gray-800 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-200 transition-colors">
-                            Veja um Exemplo
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Grid */}
-            <section className="py-20 bg-gray-50">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Nossas Ferramentas</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {features.map((feature, index) => (
-                            <motion.div
-                                key={feature.path}
-                                className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                            >
-                                <div className="text-4xl mb-4">{feature.icon}</div>
-                                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                                <p className="text-gray-600 mb-4">{feature.description}</p>
-                                <Link
-                                    to={feature.path}
-                                    className="text-blue-600 hover:text-blue-700 font-medium"
+                        <section className="pt-24 pb-16 px-4 bg-gradient-to-b from-blue-50 to-white">
+                            <div className="container mx-auto text-center">
+                                <motion.h1
+                                    className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5 }}
                                 >
-                                    Experimente →
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                                    Agilize processos com o uso de{' '}
+                                    <span className="text-blue-600">Tecnologia</span>
+                                </motion.h1>
 
+                                <motion.p
+                                    className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                >
+                                    Crie posts, logos e imagens em minutos. Ideal para facilitar o seu trabalho e aumentar a produtividade.
+                                </motion.p>
+                
 
-
-
-          {/* Post Generator Section */}
+                                <div className="flex justify-center space-x-4">
+                                    <Link
+                                        to="/sign-up"
+                                        className="bg-blue-600 text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-blue-700 transition-colors shadow-md"
+                                    >
+                                        Experimente Gratuitamente
+                                    </Link>
+                                    <button className="bg-gray-100 text-gray-800 px-6 py-3 rounded-full text-base font-semibold hover:bg-gray-200 transition-colors shadow-md">
+                                        Veja um Exemplo
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+                        <section className="py-16 bg-gray-50">
+                            <div className="container mx-auto px-4">
+                                <h2 className="text-2xl font-bold text-center mb-10">Nossas Ferramentas</h2>
+                                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                                    {features.map((feature, index) => (
+                                        <motion.div
+                                            key={feature.path}
+                                            className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.1 }}
+                                        >
+                                            <div className="text-3xl mb-3">{feature.icon}</div>
+                                            <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                                            <p className="text-gray-600 mb-3">{feature.description}</p>
+                                            <Link
+                                                to={feature.path}
+                                                className="text-blue-600 hover:text-blue-700 font-medium"
+                                            >
+                                                Experimente →
+                                            </Link>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
             <section className="py-20 bg-gray-50">
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-3xl font-bold mb-8">Crie Posts com Facilidade</h2>

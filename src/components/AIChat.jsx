@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Image as ImageIcon, History, Menu, X, PlusCircle } from 'lucide-react'; // Adicione PlusCircle
 import withProtectedRoute from './shared/ProtectedRoute';
+import ThreePIcon from '@mui/icons-material/ThreeP';
 import Header from './shared/Header';
 
 function AIChat() {
@@ -150,7 +151,7 @@ function AIChat() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white-50">
       <Header />
 
       {/* Mobile Sidebar Toggle */}
@@ -172,7 +173,7 @@ function AIChat() {
             top-0 left-0 z-40
             w-3/4 sm:w-80 md:w-64
             h-screen md:h-[80vh]
-            bg-gray-50 border-r rounded-r-xl md:rounded-xl
+            bg-gray-100 border-r rounded-r-xl md:rounded-xl
             overflow-y-auto shadow-lg md:shadow-sm
             mt-16 md:mt-0
             flex flex-col
@@ -196,17 +197,27 @@ function AIChat() {
 
               return (
                 <button
-                  key={conversation.id || index} // Use o ID da conversa como key
+                  key={conversation.id || index} 
                   onClick={() => handleHistoryClick(conversation)}
                   className={`
-                    block w-full text-left p-2 border rounded-lg text-sm truncate
+                    block w-full text-left  border text-sm truncate hover:bg-gray-100 hover:shadow-sm p-3 rounded-md transition
                     ${isSelected ? 'bg-blue-100 border-blue-300 text-blue-800 font-semibold' : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-200'}
                   `}
                   title={title}
                 >
-                  {firstUserMessage ? '🧑 ' : ''} 
+                  {firstUserMessage ? <ThreePIcon fontSize="large" className="text-blue-500 px-1" /> : ''} 
                   {title.slice(0, 50)}{title.length > 50 ? '...' : ''}
+                  <div>
+                      <span className="text-gray-400 text-xs ml-2">
+                    {new Date(conversation.messages[0].created_at).toLocaleDateString('pt-BR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })}
+                  </span>
+                  </div>
                 </button>
+                
               );
             })}
           </div>
