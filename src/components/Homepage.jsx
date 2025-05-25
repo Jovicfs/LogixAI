@@ -4,11 +4,15 @@ import { motion } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
-import DesignServicesIcon from '@mui/icons-material/DesignServices';
-import ImageIcon from '@mui/icons-material/Image';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import ChatIcon from '@mui/icons-material/Chat';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+// Material UI Icons
+import {
+    AutoAwesome as AutoAwesomeIcon,
+    Brush as BrushIcon,
+    SmartToy as SmartToyIcon,
+    RocketLaunch as RocketLaunchIcon,
+    KeyboardArrowDown as KeyboardArrowDownIcon,
+    Image as ImageIcon
+} from '@mui/icons-material';
 
 function HomePage() {
     const theme = useTheme();
@@ -26,28 +30,60 @@ function HomePage() {
 
     const features = [
         {
-            title: 'Design de Logos',
-            description: 'Identidade visual única e personalizada.',
-            icon: <DesignServicesIcon fontSize="large" className="text-blue-600" />,
-            path: '/create-logo'
+            title: 'Logos IA',
+            description: 'Crie logos únicos em minutos.',
+            icon: <BrushIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/create-logo',
+            gradient: 'from-blue-500 to-blue-600'
         },
         {
-            title: 'Geração de Imagens',
-            description: 'Transforme ideias em arte digital com IA.',
-            icon: <ImageIcon fontSize="large" className="text-green-600" />,
-            path: '/create-image'
+            title: 'Posts IA',
+            description: 'Gere posts para redes sociais.',
+            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/create-post',
+            gradient: 'from-yellow-500 to-yellow-600'
         },
         {
-            title: 'Preço',
-            description: 'Efetue o pagamento para ter acesso às nossas ferramentas!',
-            icon: <PaymentsIcon fontSize="large" className="text-yellow-600" />,
-            path: '/pricing'
+            title: 'Editor de Imagens',
+            description: 'Edite imagens com IA.',
+            icon: <ImageIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/edit-image',
+            gradient: 'from-green-500 to-green-600'
+        },
+        { title: 'Vídeos com IA',
+            description: 'Crie vídeos incríveis em instantes.',
+            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/create-video',
+            gradient: 'from-red-500 to-red-600'            
+        
         },
         {
-            title: 'Chat com IA',
-            description: 'Converse com nossa IA para obter insights e ideias.',
-            icon: <ChatIcon fontSize="large" className="text-purple-600" />,
-            path: '/ai-chat'
+            title: 'Sintetizador de Voz',
+            description: 'Transforme texto em fala natural.',
+            icon: <SmartToyIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/text-to-speech',
+            gradient: 'from-purple-500 to-purple-600'   
+        },
+        {   
+            title: 'Imagens IA',
+            description: 'Arte digital inteligente.',
+            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/create-image',
+            gradient: 'from-purple-500 to-purple-600'
+        },
+        {
+            title: 'Chat IA',
+            description: 'Assistente inteligente.',
+            icon: <SmartToyIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/ai-chat',
+            gradient: 'from-green-500 to-green-600'
+        },
+        {
+            title: 'Premium',
+            description: 'Acesso completo.',
+            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            path: '/pricing',
+            gradient: 'from-red-500 to-red-600'
         }
     ];
 
@@ -64,73 +100,74 @@ function HomePage() {
         <div className="min-h-screen" style={{ background: theme.palette.background.default }}>
             <Header isLoggedIn={isLoggedIn} username={username} />
 
-            {/* Hero */}
-            <section className="pt-24 pb-16 px-4" 
-              style={{ 
-                background: `linear-gradient(to bottom, ${theme.palette.primary.light}15, ${theme.palette.background.default})` 
-              }}
-            >
-                <div className="container mx-auto text-center">
-                    <motion.h1
-                        className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
-                        style={{ color: theme.palette.text.primary }}
+            {/* Hero Section */}
+            <section className="min-h-[90vh] flex flex-col justify-center relative px-4 sm:px-6 lg:px-8">
+                <div className="container mx-auto text-center z-10">
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                        transition={{ duration: 0.8 }}
+                        className="max-w-3xl mx-auto"
                     >
-                        Aumente sua produtividade com{' '}
-                        <span style={{ color: theme.palette.primary.main }}>
-                            Inteligência Artificial
-                        </span>
-                    </motion.h1>
-
-                    <motion.p
-                        className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                    >
-                        Crie posts, logos e imagens em minutos. Prático, rápido e inteligente.
-                    </motion.p>
-
-                    <div className="flex justify-center space-x-4">
-                        <Link
-                            to="/sign-up"
-                            className="bg-blue-600 text-white px-6 py-3 rounded-full text-base font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center gap-2"
-                        >
-                            Começar agora <ArrowForwardIosIcon fontSize="small" />
-                        </Link>
-                        <Link
-                            to="/post-generator"
-                            className="bg-gray-200 text-gray-800 px-6 py-3 rounded-full text-base font-semibold hover:bg-gray-300 transition-colors"
-                        >
-                            Ver exemplos
-                        </Link>
-                    </div>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text leading-tight">
+                            Potencialize sua criatividade com IA
+                        </h1>
+                        <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                            Crie conteúdo profissional em minutos
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Link
+                                    to="/sign-up"
+                                    className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
+                                    Começar Gratuitamente
+                                </Link>
+                            </motion.div>
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <Link
+                                    to="/ai-chat"
+                                    className="bg-white text-gray-800 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
+                                    Experimente o Chat IA
+                                </Link>
+                            </motion.div>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 
-            {/* Features */}
-            <section className="py-16" style={{ background: theme.palette.background.paper }}>
-                <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Nossas Ferramentas</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Features Section */}
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                         {features.map((feature, index) => (
                             <motion.div
                                 key={feature.path}
-                                className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 hover:-translate-y-1"
                                 initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
+                                whileHover={{ y: -5 }}
+                                className="relative group"
                             >
-                                <div className="text-4xl mb-4">{feature.icon}</div>
-                                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                                <p className="text-gray-600 mb-4">{feature.description}</p>
-                                <Link
-                                    to={feature.path}
-                                    className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-                                >
-                                    Experimente <ArrowForwardIosIcon fontSize="small" />
+                                <Link to={feature.path}>
+                                    <div className="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
+                                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                            {feature.icon}
+                                        </div>
+                                        <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
+                                        <p className="text-gray-600 text-sm line-clamp-2">{feature.description}</p>
+                                        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <RocketLaunchIcon sx={{ fontSize: 20, color: theme.palette.primary.main }} />
+                                        </div>
+                                    </div>
                                 </Link>
                             </motion.div>
                         ))}
@@ -138,47 +175,32 @@ function HomePage() {
                 </div>
             </section>
 
-            {/* Posts */}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-3xl font-bold mb-6">Crie Posts com Facilidade</h2>
-                    <p className="text-gray-600 mb-8 max-w-xl mx-auto">
-                        Nossa IA entende sua ideia e entrega conteúdo de qualidade em segundos.
-                    </p>
-                    <Link
-                        to="/post-generator"
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                        Gerar Post Agora
-                    </Link>
-                </div>
-            </section>
-
-            {/* Testimonials */}
-            <section className="py-20 bg-gray-50">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">O Que Dizem Nossos Usuários</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Testimonials Section */}
+            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Experiências</h2>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {testimonials.map((testimonial, index) => (
                             <motion.div
                                 key={index}
-                                className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition duration-300"
+                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300"
                                 initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
                                 transition={{ delay: index * 0.2 }}
                             >
                                 <div className="flex items-center mb-4">
                                     <img
                                         src={testimonial.avatar}
                                         alt={testimonial.name}
-                                        className="w-12 h-12 rounded-full mr-4"
+                                        className="w-10 h-10 rounded-full mr-3"
                                     />
                                     <div>
-                                        <h4 className="font-semibold">{testimonial.name}</h4>
-                                        <p className="text-gray-500 text-sm">{testimonial.role}</p>
+                                        <h4 className="font-semibold text-sm">{testimonial.name}</h4>
+                                        <p className="text-gray-500 text-xs">{testimonial.role}</p>
                                     </div>
                                 </div>
-                                <p className="text-gray-600 text-sm">{testimonial.comment}</p>
+                                <p className="text-gray-600 text-sm line-clamp-3">{testimonial.comment}</p>
                             </motion.div>
                         ))}
                     </div>
