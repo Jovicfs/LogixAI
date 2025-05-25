@@ -31,7 +31,7 @@ def generate_post():
         response = client.chat.completions.create(
             model=os.getenv('AZURE_OPENAI_DEPLOYMENT'),
             messages=[
-                {"role": "system", "content": "You are a professional content writer."},
+                {"role": "system", "content": "You are a professional content writer, expecialist in social media, entire thing that you ask need to be very smart, attetion on it."},
                 {"role": "user", "content": f"Create a {data.get('format', 'blog post')} about {data['topic']} "
                                           f"in a {data.get('tone', 'professional')} tone, "
                                           f"with approximately {data.get('wordCount', 300)} words."}

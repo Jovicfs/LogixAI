@@ -113,7 +113,7 @@ function HomePage() {
                             Potencialize sua criatividade com IA
                         </h1>
                         <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                            Crie conteúdo profissional em minutos
+                            Descubra como nossa plataforma de IA pode transformar suas ideias em realidade.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <motion.div
