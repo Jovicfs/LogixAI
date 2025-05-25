@@ -142,7 +142,11 @@ function HomePage() {
                     </motion.div>
                 </div>
             </section>
-
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500 to-purple-600 opacity-20"></div>
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-30"></div>
+            <div className="absolute inset-0 bg-black opacity-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-20"></div>
+            <KeyboardArrowDownIcon className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white animate-bounce" sx={{ fontSize: 40 }} />
             {/* Features Section */}
             <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
