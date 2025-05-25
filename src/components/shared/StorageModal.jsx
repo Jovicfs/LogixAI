@@ -22,7 +22,7 @@ const StorageModal = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        style={{ background: theme.palette.action.backdrop }}
+        style={{ background: theme.palette.action?.backdrop || 'rgba(0,0,0,0.5)' }}
         className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       >
         <motion.div
@@ -31,77 +31,71 @@ const StorageModal = ({
           exit={{ scale: 0.95, opacity: 0 }}
           style={{ 
             background: theme.palette.background.paper,
-            boxShadow: theme.shadows[4]
+            boxShadow: theme.shadows[4],
+            color: theme.palette.text.primary,
           }}
           className="rounded-2xl w-11/12 max-w-5xl max-h-[85vh] overflow-hidden"
         >
           {/* Header */}
-          <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <div
+            className="p-6 border-b flex justify-between items-center"
+            style={{ borderColor: theme.palette.divider, background: theme.palette.background.paper }}
+          >
+            <h2
+              className="text-2xl font-bold"
+              style={{
+                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 rounded-full transition-colors"
+              style={{ background: theme.palette.action?.hover || theme.palette.background.default }}
             >
-              <FiX className="w-6 h-6 text-gray-500" />
+              <FiX className="w-6 h-6" style={{ color: theme.palette.text.secondary }} />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[calc(85vh-8rem)]">
+          <div className="p-6 overflow-y-auto max-h-[calc(85vh-8rem)]" style={{ background: theme.palette.background.paper }}>
             {items.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">No items saved yet</p>
+                <p style={{ color: theme.palette.text.secondary }}>No items saved yet</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((item) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-gray-50 rounded-xl overflow-hidden group hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <div className="aspect-video bg-white p-4 flex items-center justify-center">
-                      {itemRenderer ? (
-                        itemRenderer(item)
-                      ) : (
-                        <img
-                          src={item.image_url}
-                          alt={item.title || 'Generated item'}
-                          className="max-h-full w-auto object-contain"
-                        />
-                      )}
-                    </div>
-                    
-                    <div className="p-4 bg-gray-50">
-                      <div className="flex justify-between items-center">
-                        <div className="flex gap-2">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => onDownload(item)}
-                            className="px-4 py-2 bg-green-500 text-white rounded-lg flex items-center gap-2 hover:bg-green-600 transition-colors"
-                          >
-                            <FiDownload className="w-4 h-4" />
-                            <span>Download</span>
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => onDelete(item.id)}
-                            className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors"
-                          >
-                            <FiTrash2 className="w-4 h-4" />
-                            <span>Delete</span>
-                          </motion.button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              items.map((item, idx) => (
+                <div
+                  key={item.id || idx}
+                  className="flex items-center justify-between mb-4 p-4 rounded-lg"
+                  style={{
+                    background: theme.palette.background.default,
+                    border: `1px solid ${theme.palette.divider}`,
+                    color: theme.palette.text.primary
+                  }}
+                >
+                  {itemRenderer ? itemRenderer(item) : <span>{item.name || 'Item'}</span>}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onDownload(item)}
+                      className="p-2 rounded hover:opacity-80"
+                      style={{ background: theme.palette.success.light, color: theme.palette.success.dark }}
+                    >
+                      <FiDownload />
+                    </button>
+                    <button
+                      onClick={() => onDelete(item)}
+                      className="p-2 rounded hover:opacity-80"
+                      style={{ background: theme.palette.error.light, color: theme.palette.error.dark }}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </motion.div>

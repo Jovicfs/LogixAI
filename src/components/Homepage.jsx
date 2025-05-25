@@ -32,58 +32,58 @@ function HomePage() {
         {
             title: 'Logos IA',
             description: 'Crie logos únicos em minutos.',
-            icon: <BrushIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <BrushIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
             path: '/create-logo',
-            gradient: 'from-blue-500 to-blue-600'
+            gradient: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
         },
         {
             title: 'Posts IA',
             description: 'Gere posts para redes sociais.',
-            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: theme.palette.warning.contrastText }} />,
             path: '/create-post',
-            gradient: 'from-yellow-500 to-yellow-600'
+            gradient: `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`
         },
         {
             title: 'Editor de Imagens',
             description: 'Edite imagens com IA.',
-            icon: <ImageIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <ImageIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/edit-image',
-            gradient: 'from-green-500 to-green-600'
+            gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
         },
-        { title: 'Vídeos com IA',
+        {
+            title: 'Vídeos com IA',
             description: 'Crie vídeos incríveis em instantes.',
-            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: theme.palette.error.contrastText }} />,
             path: '/create-video',
-            gradient: 'from-red-500 to-red-600'            
-        
+            gradient: `linear-gradient(90deg, ${theme.palette.error.main}, ${theme.palette.error.light})`
         },
         {
             title: 'Sintetizador de Voz',
             description: 'Transforme texto em fala natural.',
-            icon: <SmartToyIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <SmartToyIcon sx={{ fontSize: 32, color: theme.palette.info.contrastText }} />,
             path: '/text-to-speech',
-            gradient: 'from-purple-500 to-purple-600'   
+            gradient: `linear-gradient(90deg, ${theme.palette.info.main}, ${theme.palette.info.light})`
         },
-        {   
+        {
             title: 'Imagens IA',
             description: 'Arte digital inteligente.',
-            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: theme.palette.secondary.contrastText }} />,
             path: '/create-image',
-            gradient: 'from-purple-500 to-purple-600'
+            gradient: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`
         },
         {
             title: 'Chat IA',
             description: 'Assistente inteligente.',
-            icon: <SmartToyIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <SmartToyIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/ai-chat',
-            gradient: 'from-green-500 to-green-600'
+            gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
         },
         {
             title: 'Premium',
             description: 'Acesso completo.',
-            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: '#fff' }} />,
+            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
             path: '/pricing',
-            gradient: 'from-red-500 to-red-600'
+            gradient: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`
         }
     ];
 
@@ -95,6 +95,15 @@ function HomePage() {
             avatar: 'https://randomuser.me/api/portraits/men/10.jpg'
         }
     ];
+
+    // Add ref for features section
+    const featuresRef = React.useRef(null);
+
+    const handleScrollToFeatures = () => {
+        if (featuresRef.current) {
+            featuresRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
         <div className="min-h-screen" style={{ background: theme.palette.background.default }}>
@@ -109,31 +118,44 @@ function HomePage() {
                         transition={{ duration: 0.8 }}
                         className="max-w-3xl mx-auto"
                     >
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text leading-tight">
+                        <h1
+                            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight"
+                            style={{
+                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main}, #a21caf)`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
+                            }}
+                        >
                             Potencialize sua criatividade com IA
                         </h1>
-                        <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                            Descubra como nossa plataforma de IA pode transformar suas ideias em realidade.
+                        <p
+                            className="text-lg sm:text-xl mb-8 max-w-2xl mx-auto"
+                            style={{ color: theme.palette.text.secondary }}
+                        >
+                            Descubra como nossa plataforma de IA pode transformar suas ideias em realidade
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Link
                                     to="/sign-up"
-                                    className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                    className="px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                    style={{
+                                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                        color: theme.palette.primary.contrastText
+                                    }}
                                 >
                                     Começar Gratuitamente
                                 </Link>
                             </motion.div>
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Link
                                     to="/ai-chat"
-                                    className="bg-white text-gray-800 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                    className="px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                    style={{
+                                        background: theme.palette.background.paper,
+                                        color: theme.palette.text.primary,
+                                        border: `1px solid ${theme.palette.divider}`
+                                    }}
                                 >
                                     Experimente o Chat IA
                                 </Link>
@@ -141,15 +163,31 @@ function HomePage() {
                         </div>
                     </motion.div>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500 to-purple-600 opacity-20"></div>
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-30"></div>
-            <div className="absolute inset-0 bg-black opacity-10"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-20"></div>
-            <KeyboardArrowDownIcon className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white animate-bounce" sx={{ fontSize: 40 }} />
-            
+                {/* Background overlays */}
+                <div className="absolute inset-0"
+                    style={{
+                        background: `linear-gradient(to bottom, ${theme.palette.primary.light}99 0%, #a21caf99 100%)`
+                    }}
+                ></div>
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-30"></div>
+                <div className="absolute inset-0 bg-black opacity-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-20"></div>
+                <motion.div
+                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2 cursor-pointer z-20"
+                    animate={{ y: [0, 16, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                    onClick={handleScrollToFeatures}
+                >
+                    <KeyboardArrowDownIcon sx={{ fontSize: 40, color: theme.palette.primary.contrastText }} />
+                </motion.div>
             </section>
+
             {/* Features Section */}
-            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+            <section
+                ref={featuresRef}
+                className="py-12 sm:py-16 lg:py-20"
+                style={{ background: theme.palette.background.paper }}
+            >
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                         {features.map((feature, index) => (
@@ -163,12 +201,25 @@ function HomePage() {
                                 className="relative group"
                             >
                                 <Link to={feature.path}>
-                                    <div className="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
-                                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                                    <div
+                                        className="rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 h-full"
+                                        style={{
+                                            background: theme.palette.background.paper,
+                                            border: `1px solid ${theme.palette.divider}`,
+                                            color: theme.palette.text.primary
+                                        }}
+                                    >
+                                        <div
+                                            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"
+                                            style={{
+                                                background: feature.gradient,
+                                                boxShadow: theme.shadows[2]
+                                            }}
+                                        >
                                             {feature.icon}
                                         </div>
-                                        <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                                        <p className="text-gray-600 text-sm line-clamp-2">{feature.description}</p>
+                                        <h3 className="text-lg font-bold mb-2" style={{ color: theme.palette.text.primary }}>{feature.title}</h3>
+                                        <p className="text-gray-600 text-sm line-clamp-2" style={{ color: theme.palette.text.secondary }}>{feature.description}</p>
                                         <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                             <RocketLaunchIcon sx={{ fontSize: 20, color: theme.palette.primary.main }} />
                                         </div>
@@ -181,14 +232,18 @@ function HomePage() {
             </section>
 
             {/* Testimonials Section */}
-            <section className="py-12 sm:py-16 lg:py-20 bg-gray-50">
+            <section className="py-12 sm:py-16 lg:py-20" style={{ background: theme.palette.background.default }}>
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Experiências</h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12" style={{ color: theme.palette.text.primary }}>Experiências</h2>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {testimonials.map((testimonial, index) => (
                             <motion.div
                                 key={index}
-                                className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300"
+                                className="p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300"
+                                style={{
+                                    background: theme.palette.background.paper,
+                                    color: theme.palette.text.primary
+                                }}
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
                                 viewport={{ once: true }}
@@ -201,11 +256,11 @@ function HomePage() {
                                         className="w-10 h-10 rounded-full mr-3"
                                     />
                                     <div>
-                                        <h4 className="font-semibold text-sm">{testimonial.name}</h4>
-                                        <p className="text-gray-500 text-xs">{testimonial.role}</p>
+                                        <h4 className="font-semibold text-sm" style={{ color: theme.palette.text.primary }}>{testimonial.name}</h4>
+                                        <p className="text-xs" style={{ color: theme.palette.text.secondary }}>{testimonial.role}</p>
                                     </div>
                                 </div>
-                                <p className="text-gray-600 text-sm line-clamp-3">{testimonial.comment}</p>
+                                <p className="text-sm line-clamp-3" style={{ color: theme.palette.text.secondary }}>{testimonial.comment}</p>
                             </motion.div>
                         ))}
                     </div>

@@ -1,7 +1,7 @@
 import logging
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, String, Text, Float, text
+from sqlalchemy import create_engine, text, Column, Integer, String, Text, Float, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
@@ -25,18 +25,20 @@ if not DATABASE_URL:
 try:
     engine = create_engine(DATABASE_URL)
     with engine.connect() as connection:
-        connection.execute(text("SELECT 1"))
-    logger.info("Conexão com o banco de dados estabelecida com sucesso.")
+        connection.execute(text("SELECT 1"))  # Changed from Text to text
+        connection.commit()
+    logger.info("Database connection established successfully.")
 except OperationalError as e:
-    logger.error(f"Erro ao conectar com o banco de dados: {e}")
-    raise SystemExit("Falha crítica na conexão com o banco de dados.") from e
+    logger.error(f"Database connection error: {e}")
+    raise SystemExit("Critical database connection failure.") from e
 except Exception as e:
-    logger.exception(f"Um erro inesperado ocorreu na inicialização do banco de dados: {e}")
     raise SystemExit("Erro na inicialização do banco de dados.") from e
 
 Base = declarative_base()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+ 
 
+ #Models
 class User(Base):
     __tablename__ = 'users'
 
@@ -95,6 +97,27 @@ class ChatMessage(Base):
     content = Column(Text, nullable=False)
     image_path = Column(String(255), nullable=True)
     created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
+    
+
+class PostGenerator(Base):
+    __tablename__ = 'chat_messages_post_generator'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False)
+    post_id = Column(String(36), default=lambda: str(uuid.uuid4()), nullable=False)
+    role = Column(String, nullable=False)  # "user" ou "assistant"
+    content = Column(Text, nullable=False)
+    created_at = Column(String, default=lambda: datetime.utcnow().isoformat())
+
+class Post(Base):
+    __tablename__ = 'posts'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    topic = Column(String(200), nullable=False)
+    content = Column(Text, nullable=False)
+    format = Column(String(50))
+    tone = Column(String(50))
+    word_count = Column(Integer)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 def init_db():
     try:
@@ -166,6 +189,32 @@ def verify_token(token):
             return None
     except Exception as e:
         logger.exception(f"Erro ao verificar token: {e}")
+        return None
+    finally:
+        session.close()
+
+
+        #Functions for Logo, Image, Payment, and ChatMessage, and PostGenerator
+
+
+def get_user_post(user_id,post_id):
+    session = SessionLocal()
+    try:
+        post = session.query(PostGenerator).filter(
+            PostGenerator.user_id == user_id,
+            PostGenerator.post_id == post_id
+        ).first()
+        if post:
+            return {
+                'id': post.id,
+                'post_id': post.post_id,
+                'role': post.role,
+                'content': post.content,
+                'created_at': post.created_at
+            }
+        return None
+    except Exception as e:
+        logger.exception(f"Error fetching user post: {e}")
         return None
     finally:
         session.close()
@@ -437,6 +486,86 @@ def get_chat_history(user_id):
     except Exception as e:
         logger.exception(f"Error fetching chat history: {e}")
         return []
+    finally:
+        session.close()
+
+def get_posts_history(user_id):
+    """Get all posts for a user"""
+    session = SessionLocal()
+    try:
+        posts = session.query(Post).filter(Post.user_id == user_id).order_by(Post.created_at.desc()).all()
+        # Always return a list (empty if none)
+        return posts if posts else []
+    except Exception as e:
+        logger.error(f"Error getting posts history: {e}")
+        return []
+    finally:
+        session.close()
+
+def create_post(user_id, topic, content, format, tone, word_count):
+    """Create a new post"""
+    session = SessionLocal()
+    try:
+        # Defensive: ensure word_count is int
+        try:
+            word_count = int(word_count)
+        except Exception:
+            word_count = 0
+        post = Post(
+            user_id=user_id,
+            topic=topic,
+            content=content,
+            format=format,
+            tone=tone,
+            word_count=word_count
+        )
+        session.add(post)
+        session.commit()
+        logger.info(f"Post created successfully: {post.id}")
+        return post
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error creating post: {e}")
+        return None
+    finally:
+        session.close()
+
+def update_post(post_id, user_id, topic, content):
+    """Update an existing post"""
+    session = SessionLocal()
+    try:
+        post = session.query(Post).filter(Post.id == post_id, Post.user_id == user_id).first()
+        if post:
+            post.topic = topic
+            post.content = content
+            session.commit()
+            logger.info(f"Post updated successfully: {post_id}")
+            return True
+        logger.warning(f"Post not found: {post_id}")
+        return False
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error updating post: {e}")
+        return False
+    finally:
+        session.close()
+
+def delete_post(post_id, user_id):
+    """Delete a post"""
+    session = SessionLocal()
+    try:
+        post = session.query(Post).filter(Post.id == post_id, Post.user_id == user_id).first()
+        if post:
+            session.delete(post)
+            session.commit()
+            logger.info(f"Post deleted successfully: {post_id}")
+            return True
+        logger.warning(f"Post not found: {post_id}")
+        return False
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error deleting post: {e}")
+        return False
     finally:
         session.close()
 
