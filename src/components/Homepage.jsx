@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTheme } from '@mui/material/styles';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
@@ -10,6 +11,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 function HomePage() {
+    const theme = useTheme();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState('');
 
@@ -59,20 +61,27 @@ function HomePage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen" style={{ background: theme.palette.background.default }}>
             <Header isLoggedIn={isLoggedIn} username={username} />
 
             {/* Hero */}
-            <section className="pt-28 pb-20 px-4 bg-gradient-to-br from-blue-50 to-white">
+            <section className="pt-24 pb-16 px-4" 
+              style={{ 
+                background: `linear-gradient(to bottom, ${theme.palette.primary.light}15, ${theme.palette.background.default})` 
+              }}
+            >
                 <div className="container mx-auto text-center">
                     <motion.h1
-                        className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight"
+                        className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
+                        style={{ color: theme.palette.text.primary }}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                     >
                         Aumente sua produtividade com{' '}
-                        <span className="text-blue-600">Inteligência Artificial</span>
+                        <span style={{ color: theme.palette.primary.main }}>
+                            Inteligência Artificial
+                        </span>
                     </motion.h1>
 
                     <motion.p
@@ -102,7 +111,7 @@ function HomePage() {
             </section>
 
             {/* Features */}
-            <section className="py-20 bg-gray-50">
+            <section className="py-16" style={{ background: theme.palette.background.paper }}>
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-center mb-12">Nossas Ferramentas</h2>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">

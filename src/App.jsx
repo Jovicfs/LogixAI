@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import theme from './theme';
+
 import Signin from './components/signin';
 import Homepage from './components/Homepage';
 import Signup from './components/signup';
@@ -9,8 +12,6 @@ import CreateLogo from './components/CreateLogo';
 import GenerateImage from './components/GenerateImage';
 import AIChat from './components/AIChat';
 import PostGenerator from './components/shared/PostGenerator';
-import { createContext, useState, useEffect } from 'react';
-import { auth } from './utils/api';
 
 export const AuthContext = createContext(null);
 
@@ -46,19 +47,22 @@ function App() {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ authState, setAuthState }}>
-            <Routes>
-                <Route path="/sign-in" element={<Signin/>} />
-                <Route exact path="/" element={<Homepage/>} />
-                <Route path='/sign-up' element={<Signup/>}/>
-                <Route path='/pricing' element={<Pricing/>}/>
-                <Route path='/about' element={<About/>}/>
-                <Route path='create-logo' element={<CreateLogo/>}/>
-                <Route path='create-image' element={<GenerateImage/>}/>
-                <Route path="/ai-chat" element={<AIChat />} />
-                <Route path="/post-generator" element={<PostGenerator />} />
-            </Routes>
-        </AuthContext.Provider>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AuthContext.Provider value={{ authState, setAuthState }}>
+                <Routes>
+                    <Route path="/sign-in" element={<Signin />} />
+                    <Route exact path="/" element={<Homepage />} />
+                    <Route path="/sign-up" element={<Signup />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/create-logo" element={<CreateLogo />} />
+                    <Route path="/create-image" element={<GenerateImage />} />
+                    <Route path="/ai-chat" element={<AIChat />} />
+                    <Route path="/post-generator" element={<PostGenerator />} />
+                </Routes>
+            </AuthContext.Provider>
+        </ThemeProvider>
     );
 }
 

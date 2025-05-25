@@ -6,8 +6,10 @@ import { AuthContext } from '../App';
 import LoadingSpinner from './shared/LoadingSpinner';
 import withProtectedRoute from './shared/ProtectedRoute';
 import StorageModal from './shared/StorageModal';
+import { useTheme } from '@mui/material/styles';
 
 function CreateLogo() {
+  const theme = useTheme();
   const [companyName, setCompanyName] = useState('');
   const [sector, setSector] = useState('');
   const [style, setStyle] = useState('');
@@ -177,17 +179,21 @@ function CreateLogo() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+    <div className="min-h-screen" style={{ background: theme.palette.background.default }}>
       <Header 
         onShowLogos={() => setShowStorageMenu(true)}
         buttonText="My Logos"
       />
       
-      <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-4 pt-24 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+          style={{
+            background: theme.palette.background.paper,
+            boxShadow: theme.shadows[1]
+          }}
+          className="max-w-4xl mx-auto rounded-2xl p-8"
         >
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Crie Seu Logo</h1>

@@ -3,8 +3,10 @@ import { Send, Image as ImageIcon, History, Menu, X, PlusCircle } from 'lucide-r
 import withProtectedRoute from './shared/ProtectedRoute';
 import ThreePIcon from '@mui/icons-material/ThreeP';
 import Header from './shared/Header';
+import { useTheme } from '@mui/material/styles';
 
 function AIChat() {
+  const theme = useTheme();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]); // Array de mensagens da conversa ATUAL
   const [isLoading, setIsLoading] = useState(false);
@@ -151,7 +153,7 @@ function AIChat() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white-50">
+    <div className="flex flex-col min-h-screen" style={{ background: theme.palette.background.default }}>
       <Header />
 
       {/* Mobile Sidebar Toggle */}
@@ -163,7 +165,7 @@ function AIChat() {
       </button>
 
       <main className="flex-1 flex w-full max-w-[1400px] mx-auto px-2 md:px-4 pt-20 pb-8 gap-4 relative">
-        {/* Responsive Sidebar */}
+        {/* Sidebar */}
         <aside 
           className={`
             ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -178,6 +180,10 @@ function AIChat() {
             mt-16 md:mt-0
             flex flex-col
           `}
+          style={{ 
+            background: theme.palette.background.paper,
+            borderColor: theme.palette.divider 
+          }}
         >
           <div className="p-4 border-b flex items-center gap-2 font-semibold text-gray-700">
             <History size={20} />
@@ -240,7 +246,9 @@ function AIChat() {
         )}
 
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col bg-gray-100 rounded-2xl shadow-lg overflow-hidden min-w-0">
+        <div className="flex-1 flex flex-col rounded-2xl shadow-lg overflow-hidden min-w-0"
+          style={{ background: theme.palette.background.paper }}
+        >
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-6 space-y-4">
             {messages.length === 0 && !isLoading && (

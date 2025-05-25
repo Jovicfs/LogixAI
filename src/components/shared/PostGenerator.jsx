@@ -7,8 +7,10 @@ import PublishIcon from '@mui/icons-material/Publish';
 import Header from '../shared/Header';
 import Toast from '../shared/Toast';
 import withProtectedRoute from '../shared/ProtectedRoute';
+import { useTheme } from '@mui/material/styles';
 
 function PostGeneratorUI() {
+  const theme = useTheme();
   const [topic, setTopic] = useState('');
   const [tone, setTone] = useState('Profissional');
   const [wordCount, setWordCount] = useState('300');
@@ -52,21 +54,27 @@ function PostGeneratorUI() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: theme.palette.background.default }}>
       <Header />
       <Box 
         maxWidth={800} 
         mx="auto" 
         px={3}
         sx={{ 
-          pt: '100px', // Add padding top to account for fixed header
+          pt: '100px',
           pb: 4,
-          minHeight: 'calc(100vh - 64px)', // Subtract header height
+          minHeight: 'calc(100vh - 64px)',
           display: 'flex',
           flexDirection: 'column'
         }}
       >
-        <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center">
+        <Typography 
+          variant="h4" 
+          fontWeight="bold" 
+          gutterBottom 
+          textAlign="center"
+          sx={{ color: theme.palette.primary.main }}
+        >
           Gerar Post com IA
         </Typography>
 
@@ -77,6 +85,16 @@ function PostGeneratorUI() {
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           margin="normal"
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '&:hover fieldset': {
+                borderColor: theme.palette.primary.main,
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: theme.palette.primary.main,
+              }
+            }
+          }}
         />
 
         <Box display="flex" gap={2} mt={2} mb={2}>
@@ -86,6 +104,16 @@ function PostGeneratorUI() {
             value={tone}
             onChange={(e) => setTone(e.target.value)}
             fullWidth
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': {
+                  borderColor: theme.palette.primary.main,
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: theme.palette.primary.main,
+                }
+              }
+            }}
           >
             <MenuItem value="Profissional">Profissional</MenuItem>
             <MenuItem value="Descontraído">Descontraído</MenuItem>
@@ -97,6 +125,16 @@ function PostGeneratorUI() {
             value={wordCount}
             onChange={(e) => setWordCount(e.target.value)}
             fullWidth
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': {
+                  borderColor: theme.palette.primary.main,
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: theme.palette.primary.main,
+                }
+              }
+            }}
           />
 
           <TextField
@@ -105,6 +143,16 @@ function PostGeneratorUI() {
             value={format}
             onChange={(e) => setFormat(e.target.value)}
             fullWidth
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&:hover fieldset': {
+                  borderColor: theme.palette.primary.main,
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: theme.palette.primary.main,
+                }
+              }
+            }}
           >
             <MenuItem value="Post de blog">Post de blog</MenuItem>
             <MenuItem value="Legenda Instagram">Legenda Instagram</MenuItem>
@@ -116,7 +164,16 @@ function PostGeneratorUI() {
           fullWidth
           variant="contained"
           size="large"
-          sx={{ mt: 2, mb: 4, fontWeight: 'bold', fontSize: '1rem' }}
+          sx={{ 
+            mt: 2, 
+            mb: 4, 
+            fontWeight: 'bold', 
+            fontSize: '1rem',
+            backgroundColor: theme.palette.primary.main,
+            '&:hover': {
+              backgroundColor: theme.palette.primary.dark,
+            }
+          }}
           onClick={handleGenerate}
           disabled={loading || !topic}
         >
@@ -132,19 +189,68 @@ function PostGeneratorUI() {
         )}
         
         {post && (
-          <Card variant="outlined" sx={{ p: 3, backgroundColor: '#fafafa' }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Card 
+            variant="outlined" 
+            sx={{ 
+              p: 3, 
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: theme.shadows[1]
+            }}
+          >
+            <Typography 
+              variant="h6" 
+              fontWeight="bold" 
+              gutterBottom
+              sx={{ color: theme.palette.primary.main }}
+            >
               {topic}
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                whiteSpace: 'pre-wrap',
+                color: theme.palette.text.primary
+              }}
+            >
               {post}
             </Typography>
 
             <Box display="flex" justifyContent="space-around" mt={2}>
-              <IconButton onClick={handleCopy}><ContentCopyIcon /></IconButton>
-              <IconButton><SaveIcon /></IconButton>
-              <IconButton onClick={handleGenerate}><ReplayIcon /></IconButton>
-              <IconButton><PublishIcon /></IconButton>
+              <IconButton 
+                onClick={handleCopy}
+                sx={{ 
+                  color: theme.palette.primary.main,
+                  '&:hover': { color: theme.palette.primary.dark }
+                }}
+              >
+                <ContentCopyIcon />
+              </IconButton>
+              <IconButton 
+                sx={{ 
+                  color: theme.palette.primary.main,
+                  '&:hover': { color: theme.palette.primary.dark }
+                }}
+              >
+                <SaveIcon />
+              </IconButton>
+              <IconButton 
+                onClick={handleGenerate}
+                sx={{ 
+                  color: theme.palette.primary.main,
+                  '&:hover': { color: theme.palette.primary.dark }
+                }}
+              >
+                <ReplayIcon />
+              </IconButton>
+              <IconButton 
+                sx={{ 
+                  color: theme.palette.primary.main,
+                  '&:hover': { color: theme.palette.primary.dark }
+                }}
+              >
+                <PublishIcon />
+              </IconButton>
             </Box>
           </Card>
         )}

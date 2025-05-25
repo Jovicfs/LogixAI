@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '@mui/material/styles';
 import Header from './shared/Header';
 import LoadingSpinner from './shared/LoadingSpinner';
 import withProtectedRoute from './shared/ProtectedRoute';
 import StorageModal from './shared/StorageModal';
 
 function CreateImage() {
+  const theme = useTheme();
   const [prompt, setPrompt] = useState('');
   const [style, setStyle] = useState('');
   const [generatedImage, setGeneratedImage] = useState('');
@@ -111,17 +113,21 @@ function CreateImage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
+    <div className="min-h-screen" style={{ background: theme.palette.background.default }}>
       <Header 
         onShowLogos={() => setShowStorage(true)}
         buttonText="My Images"
       />
 
-      <main className="flex-grow container mx-auto px-4 pt-24 pb-12">
+      <main className="container mx-auto px-4 pt-24 pb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8"
+          style={{
+            background: theme.palette.background.paper,
+            boxShadow: theme.shadows[1]
+          }}
+          className="max-w-4xl mx-auto rounded-2xl p-8"
         >
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Create Image</h1>
