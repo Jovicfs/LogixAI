@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
 import Header from './shared/Header';
 // Removed Footer import
 import { Check, AlertCircle } from 'lucide-react';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 function Pricing() {
   const [loading, setLoading] = useState(false);
@@ -16,14 +19,11 @@ function Pricing() {
 
   const checkPaymentStatus = async () => {
     try {
-      const response = await fetch('http://localhost:5000/verify-status', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const response = await fetch('http://localhost:5000/payment/status', {
+        credentials: 'include'
       });
       const data = await response.json();
-      setHasValidPayment(data.has_valid_payment);
+      setHasValidPayment(data.status === 'active');
     } catch (error) {
       console.error('Error checking payment status:', error);
     }
@@ -34,31 +34,35 @@ function Pricing() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:5000/pagar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          price,
-          title: 'LogixAI Premium',
-          description: 'Access to all premium features'
-        })
-      });
+        const response = await fetch('http://localhost:5000/payment/create-checkout-session', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-      const data = await response.json();
-      
-      if (data.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        setError('Failed to initialize payment');
-      }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to create checkout session');
+        }
+
+        const { sessionId } = await response.json();
+        
+        const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+        if (!stripe) {
+            throw new Error('Failed to load Stripe');
+        }
+
+        const { error } = await stripe.redirectToCheckout({ sessionId });
+        if (error) {
+            throw error;
+        }
     } catch (error) {
-      setError('Payment processing failed');
-      console.error('Payment error:', error);
+        console.error('Payment error:', error);
+        setError(error.message || 'Payment processing failed');
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 

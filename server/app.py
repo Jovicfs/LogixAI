@@ -8,7 +8,7 @@ from routes.logo import logo_bp
 from routes.image import image_bp
 from routes.payment import payment_bp
 from routes.trends import trends_bp
-from routes.post_ideas import post_bp
+from routes.post import post_bp
 from routes.chat import chat_bp
 from routes.mercado_pago_integration import create_preference
 

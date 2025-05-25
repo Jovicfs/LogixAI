@@ -1,125 +1,156 @@
-import React, { useState } from "react";
-import Header from "./Header";
+import React, { useState } from 'react';
+import { TextField, Button, MenuItem, Card, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SaveIcon from '@mui/icons-material/Save';
+import ReplayIcon from '@mui/icons-material/Replay';
+import PublishIcon from '@mui/icons-material/Publish';
+import Header from '../shared/Header';
+import Toast from '../shared/Toast';
+import withProtectedRoute from '../shared/ProtectedRoute';
 
-import LoadingSpinner from "./LoadingSpinner";
-import withProtectedRoute from "./ProtectedRoute";
+function PostGeneratorUI() {
+  const [topic, setTopic] = useState('');
+  const [tone, setTone] = useState('Profissional');
+  const [wordCount, setWordCount] = useState('300');
+  const [format, setFormat] = useState('Post de blog');
+  const [post, setPost] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-function PostGenerator() {
-  const [keyword, setKeyword] = useState("");
-  const [trends, setTrends] = useState([]);
-  const [selectedTrend, setSelectedTrend] = useState("");
-  const [postIdeas, setPostIdeas] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleFetchTrends = async () => {
-    if (!keyword) {
-      setError("Digite um tema (ex: moda, beleza, tecnologia).");
-      return;
-    }
-
-    setError("");
-    setIsLoading(true);
-    setTrends([]);
-    setPostIdeas("");
+  const handleGenerate = async () => {
+    setLoading(true);
+    setError(null);
 
     try {
-      const response = await fetch(`http://localhost:5000/trending?keyword=${keyword}`);
+      const response = await fetch('http://localhost:5000/post/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          topic,
+          tone,
+          wordCount: parseInt(wordCount),
+          format
+        })
+      });
+
       const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || "Erro ao buscar tendências.");
-
-      setTrends(data.trends || []);
+      if (!response.ok) throw new Error(data.error || 'Failed to generate post');
+      
+      setPost(data.content);
     } catch (err) {
-      setError("Erro ao buscar tendências.");
-      console.error(err);
+      setError(err.message);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleGeneratePostIdeas = async (trend) => {
-    setIsLoading(true);
-    setPostIdeas("");
-    setSelectedTrend(trend);
-
-    try {
-      const response = await fetch(`http://localhost:5000/post_ideas?trend=${encodeURIComponent(trend)}`);
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || "Erro ao gerar ideias.");
-
-      setPostIdeas(data.post_ideas);
-    } catch (err) {
-      setError("Erro ao gerar ideias de post.");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCopy = () => {
+    navigator.clipboard.writeText(post);
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 mt-16">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Ideias de Post com IA + Tendências
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Descubra o que está em alta e gere ideias de conteúdo com um clique.
-          </p>
+      <Box 
+        maxWidth={800} 
+        mx="auto" 
+        px={3}
+        sx={{ 
+          pt: '100px', // Add padding top to account for fixed header
+          pb: 4,
+          minHeight: 'calc(100vh - 64px)', // Subtract header height
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" gutterBottom textAlign="center">
+          Gerar Post com IA
+        </Typography>
 
-          <div className="space-y-4">
-            <input
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Digite um tema (ex: moda, beleza, tecnologia)..."
-              className="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+        <TextField
+          fullWidth
+          label="Tópico"
+          placeholder="Vantagens do trabalho remoto"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          margin="normal"
+        />
 
-            <button
-              onClick={handleFetchTrends}
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-            >
-              {isLoading ? <LoadingSpinner /> : "Buscar Tendências"}
-            </button>
+        <Box display="flex" gap={2} mt={2} mb={2}>
+          <TextField
+            select
+            label="Tom"
+            value={tone}
+            onChange={(e) => setTone(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Profissional">Profissional</MenuItem>
+            <MenuItem value="Descontraído">Descontraído</MenuItem>
+            <MenuItem value="Inspirador">Inspirador</MenuItem>
+          </TextField>
 
-            {error && <p className="text-red-500">{error}</p>}
-          </div>
+          <TextField
+            label="Contagem de palavras"
+            value={wordCount}
+            onChange={(e) => setWordCount(e.target.value)}
+            fullWidth
+          />
 
-          {trends.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-xl font-bold text-gray-800 mb-2">Tópicos em alta:</h2>
-              <ul className="space-y-2">
-                {trends.map((trend, index) => (
-                  <li key={index} className="flex justify-between items-center border p-3 rounded-lg">
-                    <span>{trend.query}</span>
-                    <button
-                      onClick={() => handleGeneratePostIdeas(trend.query)}
-                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                    >
-                      Gerar ideias
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <TextField
+            select
+            label="Formato"
+            value={format}
+            onChange={(e) => setFormat(e.target.value)}
+            fullWidth
+          >
+            <MenuItem value="Post de blog">Post de blog</MenuItem>
+            <MenuItem value="Legenda Instagram">Legenda Instagram</MenuItem>
+            <MenuItem value="Tweet">Tweet</MenuItem>
+          </TextField>
+        </Box>
 
-          {postIdeas && (
-            <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-              <h2 className="text-xl font-bold text-gray-800 mb-2">
-                Ideias de post para: {selectedTrend}
-              </h2>
-              <pre className="text-gray-700 whitespace-pre-wrap">{postIdeas}</pre>
-            </div>
-          )}
-        </div>
-      </main>
+        <Button
+          fullWidth
+          variant="contained"
+          size="large"
+          sx={{ mt: 2, mb: 4, fontWeight: 'bold', fontSize: '1rem' }}
+          onClick={handleGenerate}
+          disabled={loading || !topic}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Gerar Post'}
+        </Button>
+
+        {error && (
+          <Toast 
+            message={error}
+            type="error"
+            onClose={() => setError(null)}
+          />
+        )}
+        
+        {post && (
+          <Card variant="outlined" sx={{ p: 3, backgroundColor: '#fafafa' }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              {topic}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+              {post}
+            </Typography>
+
+            <Box display="flex" justifyContent="space-around" mt={2}>
+              <IconButton onClick={handleCopy}><ContentCopyIcon /></IconButton>
+              <IconButton><SaveIcon /></IconButton>
+              <IconButton onClick={handleGenerate}><ReplayIcon /></IconButton>
+              <IconButton><PublishIcon /></IconButton>
+            </Box>
+          </Card>
+        )}
+      </Box>
     </div>
   );
 }
 
-export default withProtectedRoute(PostGenerator);
+export default withProtectedRoute(PostGeneratorUI);

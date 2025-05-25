@@ -3,30 +3,44 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../App';
 import { auth } from '../../utils/api';
 
-function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default value
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import ImageIcon from '@mui/icons-material/Image';
+import ChatIcon from '@mui/icons-material/Chat';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+
+function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   const features = [
     {
       title: 'Gerar Logo',
-      path: '/create-logo'
+      path: '/create-logo',
+      icon: <AutoAwesomeIcon fontSize="small" />
     },
     {
-      title: 'Gerar Post',  
-      path: '/post-generator'
+      title: 'Gerar Post',
+      path: '/post-generator',
+      icon: <RocketLaunchIcon fontSize="small" />
     },
     {
       title: 'Gerar Imagem',
-      path: '/create-image'
+      path: '/create-image',
+      icon: <ImageIcon fontSize="small" />
     },
     {
       title: 'Chat com IA',
-      path: '/ai-chat'
+      path: '/ai-chat',
+      icon: <ChatIcon fontSize="small" />
     },
     {
       title: 'Planos',
-      path: '/pricing'
+      path: '/pricing',
+      icon: <MonetizationOnIcon fontSize="small" />
     }
   ];
 
@@ -49,14 +63,15 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default va
           </span>
         </Link>
 
-        <nav className="hidden md:flex space-x-8">
+        <nav className="hidden md:flex space-x-6">
           {features.map(feature => (
             <Link
               key={feature.path}
               to={feature.path}
-              className="text-gray-600 hover:text-blue-600 transition-colors"
+              className="flex items-center text-gray-600 hover:text-blue-600 transition-colors space-x-1"
             >
-              {feature.title}
+              {feature.icon}
+              <span>{feature.title}</span>
             </Link>
           ))}
         </nav>
@@ -64,29 +79,41 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {  // Add default va
         <div className="flex items-center space-x-4">
           {authState.isAuthenticated ? (
             <>
-              <span className="text-gray-600">{authState.username}</span>
+              <span className="flex items-center text-gray-600 space-x-1">
+                <AccountCircleIcon fontSize="small" />
+                <span>{authState.username}</span>
+              </span>
               {onShowLogos && (
                 <button
                   onClick={onShowLogos}
                   className="text-gray-600 hover:text-blue-600 px-4 py-2"
                 >
-                  {buttonText}  {/* Use the buttonText prop here */}
+                  {buttonText}
                 </button>
               )}
               <button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors"
+                className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors flex items-center space-x-2"
               >
-                Sair
+                <LogoutIcon fontSize="small" />
+                <span>Sair</span>
               </button>
             </>
           ) : (
-            <div className="flex space-x-4">
-              <Link to="/sign-in" className="text-gray-600 hover:text-blue-600 px-4 py-2">
-                Login
+            <div className="flex space-x-4 items-center">
+              <Link
+                to="/sign-in"
+                className="text-gray-600 hover:text-blue-600 px-4 py-2 flex items-center space-x-1"
+              >
+                <LoginIcon fontSize="small" />
+                <span>Login</span>
               </Link>
-              <Link to="/sign-up" className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700">
-                Começar Agora
+              <Link
+                to="/sign-up"
+                className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 flex items-center space-x-1"
+              >
+                <RocketLaunchIcon fontSize="small" />
+                <span>Começar Agora</span>
               </Link>
             </div>
           )}
