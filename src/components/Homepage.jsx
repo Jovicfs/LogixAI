@@ -4,15 +4,17 @@ import { motion } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
 import Header from './shared/Header';
 import Footer from './shared/Footer';
-// Material UI Icons
-import {
-    AutoAwesome as AutoAwesomeIcon,
-    Brush as BrushIcon,
-    SmartToy as SmartToyIcon,
-    RocketLaunch as RocketLaunchIcon,
-    KeyboardArrowDown as KeyboardArrowDownIcon,
-    Image as ImageIcon
-} from '@mui/icons-material';
+// Material UI Icons - more diverse
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import BrushIcon from '@mui/icons-material/Brush';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ImageIcon from '@mui/icons-material/Image';
+import ArticleIcon from '@mui/icons-material/Article';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 
 function HomePage() {
     const theme = useTheme();
@@ -39,8 +41,8 @@ function HomePage() {
         {
             title: 'Posts IA',
             description: 'Gere posts para redes sociais.',
-            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: theme.palette.warning.contrastText }} />,
-            path: '/create-post',
+            icon: <ArticleIcon sx={{ fontSize: 32, color: theme.palette.warning.contrastText }} />,
+            path: '/post-generator',
             gradient: `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`
         },
         {
@@ -53,14 +55,14 @@ function HomePage() {
         {
             title: 'Vídeos com IA',
             description: 'Crie vídeos incríveis em instantes.',
-            icon: <AutoAwesomeIcon sx={{ fontSize: 32, color: theme.palette.error.contrastText }} />,
+            icon: <VideoLibraryIcon sx={{ fontSize: 32, color: theme.palette.error.contrastText }} />,
             path: '/create-video',
             gradient: `linear-gradient(90deg, ${theme.palette.error.main}, ${theme.palette.error.light})`
         },
         {
             title: 'Sintetizador de Voz',
             description: 'Transforme texto em fala natural.',
-            icon: <SmartToyIcon sx={{ fontSize: 32, color: theme.palette.info.contrastText }} />,
+            icon: <GraphicEqIcon sx={{ fontSize: 32, color: theme.palette.info.contrastText }} />,
             path: '/text-to-speech',
             gradient: `linear-gradient(90deg, ${theme.palette.info.main}, ${theme.palette.info.light})`
         },
@@ -74,14 +76,14 @@ function HomePage() {
         {
             title: 'Chat IA',
             description: 'Assistente inteligente.',
-            icon: <SmartToyIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
+            icon: <ChatBubbleOutlineIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/ai-chat',
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
         },
         {
             title: 'Premium',
             description: 'Acesso completo.',
-            icon: <RocketLaunchIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
+            icon: <WorkspacePremiumIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
             path: '/pricing',
             gradient: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`
         }
