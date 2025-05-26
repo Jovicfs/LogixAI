@@ -153,15 +153,34 @@ function RemoveBackground() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: theme.palette.background.default }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: theme.palette.background.default,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Header />
-      <Container maxWidth="md" sx={{ pt: 10, pb: 6 }}>
+      <Container
+        maxWidth="md"
+        sx={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pt: { xs: 2, sm: 4, md: 6 },
+          pb: { xs: 2, sm: 4, md: 6 },
+        }}
+      >
         <Card
           sx={{
-            p: { xs: 2, sm: 4 },
+            p: { xs: 1, sm: 2, md: 4 },
             borderRadius: 3,
             boxShadow: theme.shadows[6],
             background: `linear-gradient(135deg, ${theme.palette.background.paper} 80%, ${theme.palette.primary.light}10 100%)`,
+            width: '100%',
+            maxWidth: 900,
           }}
         >
           <Typography
@@ -173,9 +192,10 @@ function RemoveBackground() {
               background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 4,
+              mb: { xs: 2, sm: 3, md: 4 },
               fontWeight: 700,
               letterSpacing: 1,
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
             }}
           >
             Remover Fundo de Imagem com IA
@@ -184,7 +204,7 @@ function RemoveBackground() {
           <Typography
             variant="subtitle1"
             align="center"
-            sx={{ color: theme.palette.text.secondary, mb: 3 }}
+            sx={{ color: theme.palette.text.secondary, mb: { xs: 2, sm: 3 } }}
           >
             Faça upload de uma imagem ou use o exemplo para remover o fundo automaticamente.
           </Typography>
@@ -197,10 +217,10 @@ function RemoveBackground() {
             sx={{
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
-              gap: 4,
+              gap: { xs: 2, sm: 3, md: 4 },
               alignItems: 'stretch',
               justifyContent: 'center',
-              mb: 3,
+              mb: { xs: 2, sm: 3 },
             }}
           >
             {/* Original Image */}
@@ -209,56 +229,73 @@ function RemoveBackground() {
               sx={{
                 flex: 1,
                 minWidth: 0,
-                height: { xs: 240, sm: 320, md: 360 },
+                height: { xs: 180, sm: 240, md: 340, lg: 360 },
                 border: `2px dashed ${theme.palette.divider}`,
                 borderRadius: 2,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: imageUrl
-                  ? `url(${imageUrl}) center/contain no-repeat`
-                  : theme.palette.background.default,
+                background: theme.palette.background.default,
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'background 0.3s',
                 mb: { xs: 2, md: 0 },
+                p: 0,
               }}
             >
-              {!imageUrl && !processing && (
-                <Box textAlign="center">
-                  <ImageIcon sx={{ fontSize: 60, color: theme.palette.action.disabled }} />
-                  <Typography color="textSecondary" sx={{ mt: 1 }}>
+              {imageUrl && !processing ? (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    alt="Imagem original"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                  />
+                  <Tooltip title="Remover imagem" placement="top">
+                    <IconButton
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        bgcolor: theme.palette.background.paper,
+                        color: theme.palette.error.main,
+                        '&:hover': { bgcolor: theme.palette.error.light },
+                      }}
+                      onClick={handleClear}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              ) : !imageUrl && !processing ? (
+                <Box textAlign="center" width="100%">
+                  <ImageIcon sx={{ fontSize: { xs: 36, sm: 48, md: 60 }, color: theme.palette.action.disabled }} />
+                  <Typography color="textSecondary" sx={{ mt: 1, fontSize: { xs: 12, sm: 14 } }}>
                     Nenhuma imagem selecionada
                   </Typography>
                 </Box>
-              )}
-              {processing && (
+              ) : processing ? (
                 <Fade in={processing}>
-                  <Box display="flex" flexDirection="column" alignItems="center">
+                  <Box display="flex" flexDirection="column" alignItems="center" width="100%">
                     <CircularProgress color="primary" />
                     <Typography variant="caption" color="textSecondary" sx={{ mt: 2 }}>
                       Processando...
                     </Typography>
                   </Box>
                 </Fade>
-              )}
-              {imageUrl && !processing && (
-                <Tooltip title="Remover imagem" placement="top">
-                  <IconButton
-                    sx={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      bgcolor: theme.palette.background.paper,
-                      color: theme.palette.error.main,
-                      '&:hover': { bgcolor: theme.palette.error.light },
-                    }}
-                    onClick={handleClear}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
+              ) : null}
             </Paper>
 
             {/* Result Image */}
@@ -267,56 +304,73 @@ function RemoveBackground() {
               sx={{
                 flex: 1,
                 minWidth: 0,
-                height: { xs: 240, sm: 320, md: 360 },
+                height: { xs: 180, sm: 240, md: 340, lg: 360 },
                 border: `2px dashed ${theme.palette.divider}`,
                 borderRadius: 2,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: resultUrl
-                  ? `url(${resultUrl}) center/contain no-repeat`
-                  : theme.palette.background.default,
+                background: theme.palette.background.default,
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'background 0.3s',
                 mb: { xs: 2, md: 0 },
+                p: 0,
               }}
             >
-              {!resultUrl && !processing && (
-                <Box textAlign="center">
-                  <ImageIcon sx={{ fontSize: 60, color: theme.palette.action.disabled }} />
-                  <Typography color="textSecondary" sx={{ mt: 1 }}>
+              {resultUrl && !processing ? (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <img
+                    src={resultUrl}
+                    alt="Resultado"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      display: 'block',
+                    }}
+                  />
+                  <Tooltip title="Baixar resultado" placement="top">
+                    <IconButton
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        bgcolor: theme.palette.background.paper,
+                        color: theme.palette.success.main,
+                        '&:hover': { bgcolor: theme.palette.success.light },
+                      }}
+                      onClick={handleDownload}
+                    >
+                      <DownloadIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              ) : !resultUrl && !processing ? (
+                <Box textAlign="center" width="100%">
+                  <ImageIcon sx={{ fontSize: { xs: 36, sm: 48, md: 60 }, color: theme.palette.action.disabled }} />
+                  <Typography color="textSecondary" sx={{ mt: 1, fontSize: { xs: 12, sm: 14 } }}>
                     Aguardando processamento
                   </Typography>
                 </Box>
-              )}
-              {processing && (
+              ) : processing ? (
                 <Fade in={processing}>
-                  <Box display="flex" flexDirection="column" alignItems="center">
+                  <Box display="flex" flexDirection="column" alignItems="center" width="100%">
                     <CircularProgress color="primary" />
                     <Typography variant="caption" color="textSecondary" sx={{ mt: 2 }}>
                       Processando...
                     </Typography>
                   </Box>
                 </Fade>
-              )}
-              {resultUrl && !processing && (
-                <Tooltip title="Baixar resultado" placement="top">
-                  <IconButton
-                    sx={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      bgcolor: theme.palette.background.paper,
-                      color: theme.palette.success.main,
-                      '&:hover': { bgcolor: theme.palette.success.light },
-                    }}
-                    onClick={handleDownload}
-                  >
-                    <DownloadIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
+              ) : null}
             </Paper>
           </Box>
 
@@ -329,6 +383,9 @@ function RemoveBackground() {
               sx={{
                 background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                 color: theme.palette.primary.contrastText,
+                fontSize: { xs: 12, sm: 14, md: 16 },
+                px: { xs: 2, sm: 3, md: 4 },
+                py: { xs: 1, sm: 1.5 },
               }}
             >
               Usar Exemplo
@@ -341,6 +398,9 @@ function RemoveBackground() {
               sx={{
                 background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
                 color: theme.palette.primary.contrastText,
+                fontSize: { xs: 12, sm: 14, md: 16 },
+                px: { xs: 2, sm: 3, md: 4 },
+                py: { xs: 1, sm: 1.5 },
               }}
             >
               Upload Imagem
@@ -362,6 +422,7 @@ function RemoveBackground() {
               color: theme.palette.text.secondary,
               fontStyle: 'italic',
               letterSpacing: 0.5,
+              fontSize: { xs: 12, sm: 14 },
             }}
           >
             {status}

@@ -85,7 +85,7 @@ function Pricing() {
           <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-8 text-white">
             <h2 className="text-2xl font-bold mb-4">Acesso Total</h2>
             <p className="opacity-90 mb-6">Todos os recursos em uma única assinatura</p>
-            <p className="text-4xl font-bold mb-6">R$5,00</p>
+            <p className="text-4xl font-bold mb-6">R$15,00</p>
             <ul className="space-y-4 mb-8">
               <li className="flex items-center">
                 <Check className="h-5 w-5 text-green-400 mr-2" />
