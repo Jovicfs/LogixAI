@@ -46,8 +46,8 @@ function HomePage() {
             gradient: `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`
         },
         {
-            title: 'Editor de Imagens',
-            description: 'Remova backgrounds de imagens.',
+            title: 'Remover Fundo',
+            description: 'Remova o fundo de imagens.',
             icon: <ImageIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/remove-background',
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
@@ -89,16 +89,9 @@ function HomePage() {
         }
     ];
 
-    const testimonials = [
-        {
-            name: 'João Victor',
-            role: 'Fundador da StartUp',
-            comment: 'Aqui você encontra tudo que precisa para começar a criar conteúdo.',
-            avatar: 'https://randomuser.me/api/portraits/men/10.jpg'
-        }
-    ];
 
     // Add ref for features section
+
     const featuresRef = React.useRef(null);
 
     const handleScrollToFeatures = () => {
@@ -120,19 +113,26 @@ function HomePage() {
                         transition={{ duration: 0.8 }}
                         className="max-w-3xl mx-auto"
                     >
-                        <h1
-                            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight"
-                            style={{
-                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main}, #a21caf)`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent'
-                            }}
-                        >
-                            Potencialize sua criatividade com IA
-                        </h1>
-                        <p
+                    <h1
+                   className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight animate-pulse"
+                   style={{
+                    background: 'linear-gradient(90deg, #00F5FF, #8A2BE2, #FF00FF, #FF1493)',
+                    backgroundSize: '300% 300%',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: theme.palette.primary.contrastText,
+                    textAlign: 'center',
+                    textShadow: `0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1)`,
+                    padding: '0.5rem',
+                    animation: 'pulseText 10s infinite linear'
+                    }}
+                    >
+                    Potencialize sua criatividade com IA
+                 </h1> 
+                       <p
                             className="text-lg sm:text-xl mb-8 max-w-2xl mx-auto"
-                            style={{ color: theme.palette.text.secondary }}
+                            style={{ color: theme.palette.text.primary, textShadow: `0 1px 2px rgba(0, 0, 0, 0.1)` }}
                         >
                             Descubra como nossa plataforma de IA pode transformar suas ideias em realidade
                         </p>
@@ -162,33 +162,29 @@ function HomePage() {
                                     Experimente o Chat IA
                                 </Link>
                             </motion.div>
+    
                         </div>
-                    </motion.div>
+                    </motion.div>          
                 </div>
-                {/* Background overlays */}
-                <div className="absolute inset-0"
-                    style={{
-                        background: `linear-gradient(to bottom, ${theme.palette.primary.light}99 0%, #a21caf99 100%)`
-                    }}
-                ></div>
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-30"></div>
-                <div className="absolute inset-0 bg-black opacity-10"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-20"></div>
+                          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3w5MTMyMnwwfDF8c2VhcmNofDh8fGludGVsbGlnZW5jZXxlbnwwfHx8fDE2ODU4MzIzOTZ8MA&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-35"></div>
+
                 <motion.div
                     className="absolute bottom-4 left-1/2 transform -translate-x-1/2 cursor-pointer z-20"
                     animate={{ y: [0, 16, 0] }}
                     transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
                     onClick={handleScrollToFeatures}
                 >
-                    <KeyboardArrowDownIcon sx={{ fontSize: 40, color: theme.palette.primary.contrastText }} />
+                    <KeyboardArrowDownIcon sx={{ fontSize:'2.5rem', color: theme.palette.text.primary }} />
                 </motion.div>
+   
+
             </section>
 
             {/* Features Section */}
             <section
                 ref={featuresRef}
                 className="py-12 sm:py-16 lg:py-20"
-                style={{ background: theme.palette.background.paper }}
+                style={{ background: theme.palette.background.default, color: theme.palette.text.primary }}
             >
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
@@ -232,43 +228,6 @@ function HomePage() {
                     </div>
                 </div>
             </section>
-
-            {/* Testimonials Section */}
-            <section className="py-12 sm:py-16 lg:py-20" style={{ background: theme.palette.background.default }}>
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12" style={{ color: theme.palette.text.primary }}>Experiências</h2>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {testimonials.map((testimonial, index) => (
-                            <motion.div
-                                key={index}
-                                className="p-4 sm:p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300"
-                                style={{
-                                    background: theme.palette.background.paper,
-                                    color: theme.palette.text.primary
-                                }}
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.2 }}
-                            >
-                                <div className="flex items-center mb-4">
-                                    <img
-                                        src={testimonial.avatar}
-                                        alt={testimonial.name}
-                                        className="w-10 h-10 rounded-full mr-3"
-                                    />
-                                    <div>
-                                        <h4 className="font-semibold text-sm" style={{ color: theme.palette.text.primary }}>{testimonial.name}</h4>
-                                        <p className="text-xs" style={{ color: theme.palette.text.secondary }}>{testimonial.role}</p>
-                                    </div>
-                                </div>
-                                <p className="text-sm line-clamp-3" style={{ color: theme.palette.text.secondary }}>{testimonial.comment}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
             <Footer />
         </div>
     );

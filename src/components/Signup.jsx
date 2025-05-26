@@ -69,7 +69,7 @@ function Signup() {
                 
                 setTimeout(() => {
                     setShowToast(false); // Hide toast before navigating
-                    navigate('/create-logo');
+                    navigate('/');
                 }, 2000);
             } else {
                 setErrors(data.errors || { general: 'Signup failed' });

@@ -58,7 +58,7 @@ function Signin() {
         // Delay the navigation
         setTimeout(() => {
           setShowToast(false); // Hide toast before navigating
-          navigate('/create-logo');
+          navigate('/');
           window.location.reload();
         }, 2000);
       }

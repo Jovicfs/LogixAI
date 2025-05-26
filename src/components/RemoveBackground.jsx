@@ -153,20 +153,13 @@ function RemoveBackground() {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: theme.palette.background.default,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Header />
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', alignItems: 'center', backgroundColor: theme.palette.background.default }}>
+        <Header/>
       <Container
         maxWidth="md"
         sx={{
           flex: 1,
-          display: 'flex',
+          marginTop: { xs: 8, sm: 12, md: 6 },
           alignItems: 'center',
           justifyContent: 'center',
           pt: { xs: 2, sm: 4, md: 6 },
@@ -191,14 +184,14 @@ function RemoveBackground() {
             sx={{
               background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              WebkitTextFillColor: 'transparent',              
               mb: { xs: 2, sm: 3, md: 4 },
               fontWeight: 700,
               letterSpacing: 1,
               fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
             }}
           >
-            Remover Fundo de Imagem com IA
+            Remover Fundo de Imagem
           </Typography>
 
           <Typography

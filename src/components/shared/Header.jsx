@@ -1,8 +1,29 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../App';
 import { auth } from '../../utils/api';
-
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  Box,
+  Tooltip,
+  useMediaQuery,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Slide,
+} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
@@ -11,10 +32,14 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ImageIcon from '@mui/icons-material/Image';
 import ChatIcon from '@mui/icons-material/Chat';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import CloseIcon from '@mui/icons-material/Close';
 
 function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   const { authState } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const features = [
     {
@@ -38,11 +63,24 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
       icon: <ChatIcon fontSize="small" />
     },
     {
+      title: 'Remover Fundo',
+      path: '/remove-background',
+      icon: <ImageIcon fontSize="small" />
+    },
+    {
       title: 'Planos',
       path: '/pricing',
       icon: <MonetizationOnIcon fontSize="small" />
     }
   ];
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const handleMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
+
+  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
 
   const handleLogout = async () => {
     try {
@@ -54,72 +92,261 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
     }
   };
 
-  return (
-    <header className="fixed w-full bg-white/90 backdrop-blur-sm z-50 shadow-sm">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
-            LogixAI
-          </span>
-        </Link>
+  // Modern gradient logo
+  const Logo = (
+    <Typography
+      variant="h5"
+      noWrap
+      component={Link}
+      to="/"
+      sx={{
+        fontWeight: 900,
+        letterSpacing: 1,
+        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        textDecoration: 'none',
+        mr: 2,
+        fontFamily: 'Inter, Roboto, Helvetica, Arial, sans-serif',
+      }}
+    >
+      LogixAI
+    </Typography>
+  );
 
-        <nav className="hidden md:flex space-x-6">
+  // Navigation links for desktop
+  const NavLinks = (
+    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
+      {features.map(feature => (
+        <Button
+          key={feature.path}
+          component={Link}
+          to={feature.path}
+          startIcon={feature.icon}
+          sx={{
+            color: location.pathname === feature.path ? theme.palette.primary.main : theme.palette.text.secondary,
+            fontWeight: 500,
+            borderRadius: 2,
+            px: 2,
+            background: location.pathname === feature.path
+              ? `linear-gradient(90deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`
+              : 'none',
+            '&:hover': {
+              background: `linear-gradient(90deg, ${theme.palette.primary.light}22, ${theme.palette.secondary.light}22)`,
+              color: theme.palette.primary.main,
+            }
+          }}
+        >
+          {feature.title}
+        </Button>
+      ))}
+    </Box>
+  );
+
+  // Drawer for mobile navigation
+  const DrawerMenu = (
+    <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
+      <Box sx={{ width: 260, pt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', px: 2, mb: 1 }}>
+          {Logo}
+          <IconButton onClick={handleDrawerToggle} sx={{ ml: 'auto' }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Divider />
+        <List>
           {features.map(feature => (
-            <Link
+            <ListItem
+              button
               key={feature.path}
+              component={Link}
               to={feature.path}
-              className="flex items-center text-gray-600 hover:text-blue-600 transition-colors space-x-1"
+              selected={location.pathname === feature.path}
+              onClick={handleDrawerToggle}
             >
-              {feature.icon}
-              <span>{feature.title}</span>
-            </Link>
+              <ListItemIcon>{feature.icon}</ListItemIcon>
+              <ListItemText primary={feature.title} />
+            </ListItem>
           ))}
-        </nav>
-
-        <div className="flex items-center space-x-4">
+        </List>
+        <Divider />
+        <Box sx={{ px: 2, py: 2 }}>
           {authState.isAuthenticated ? (
             <>
-              <span className="flex items-center text-gray-600 space-x-1">
-                <AccountCircleIcon fontSize="small" />
-                <span>{authState.username}</span>
-              </span>
+              <Box display="flex" alignItems="center" mb={1}>
+                <Avatar sx={{ width: 28, height: 28, mr: 1 }}>
+                  <AccountCircleIcon />
+                </Avatar>
+                <Typography variant="body2">{authState.username}</Typography>
+              </Box>
               {onShowLogos && (
-                <button
-                  onClick={onShowLogos}
-                  className="text-gray-600 hover:text-blue-600 px-4 py-2"
+                <Button
+                  onClick={() => {
+                    handleDrawerToggle();
+                    onShowLogos();
+                  }}
+                  fullWidth
+                  sx={{ mb: 1 }}
+                  variant="outlined"
+                  color="primary"
                 >
                   {buttonText}
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-colors flex items-center space-x-2"
+                fullWidth
+                variant="contained"
+                color="error"
+                startIcon={<LogoutIcon />}
               >
-                <LogoutIcon fontSize="small" />
-                <span>Sair</span>
-              </button>
+                Sair
+              </Button>
             </>
           ) : (
-            <div className="flex space-x-4 items-center">
-              <Link
+            <>
+              <Button
+                component={Link}
                 to="/sign-in"
-                className="text-gray-600 hover:text-blue-600 px-4 py-2 flex items-center space-x-1"
+                fullWidth
+                startIcon={<LoginIcon />}
+                sx={{ mb: 1 }}
+                variant="outlined"
+                color="primary"
+                onClick={handleDrawerToggle}
               >
-                <LoginIcon fontSize="small" />
-                <span>Login</span>
-              </Link>
-              <Link
+                Login
+              </Button>
+              <Button
+                component={Link}
                 to="/sign-up"
-                className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 flex items-center space-x-1"
+                fullWidth
+                startIcon={<RocketLaunchIcon />}
+                variant="contained"
+                color="primary"
+                onClick={handleDrawerToggle}
               >
-                <RocketLaunchIcon fontSize="small" />
-                <span>Começar Agora</span>
-              </Link>
-            </div>
+                Começar Agora
+              </Button>
+            </>
           )}
-        </div>
-      </div>
-    </header>
+        </Box>
+      </Box>
+    </Drawer>
+  );
+
+  // User menu for desktop
+  const UserMenu = (
+    <>
+      <Tooltip title={authState.username || 'Conta'}>
+        <IconButton onClick={handleMenu} sx={{ ml: 1 }}>
+          <Avatar sx={{ width: 32, height: 32 }}>
+            <AccountCircleIcon />
+          </Avatar>
+        </IconButton>
+      </Tooltip>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem disabled>
+          <AccountCircleIcon sx={{ mr: 1 }} />
+          {authState.username}
+        </MenuItem>
+        {onShowLogos && (
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              onShowLogos();
+            }}
+          >
+            <AutoAwesomeIcon sx={{ mr: 1 }} />
+            {buttonText}
+          </MenuItem>
+        )}
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <LogoutIcon sx={{ mr: 1 }} />
+          Sair
+        </MenuItem>
+      </Menu>
+    </>
+  );
+
+  return (
+    <Slide appear={false} direction="down" in>
+      <AppBar
+        position="fixed"
+        elevation={2}
+        sx={{
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          backdropFilter: 'blur(8px)',
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Toolbar sx={{ minHeight: 64, px: { xs: 1, sm: 2 } }}>
+          {/* Mobile menu button */}
+          {isMobile && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 1 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+
+          {Logo}
+
+          {/* Desktop navigation */}
+          {!isMobile && NavLinks}
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* Auth buttons */}
+          {authState.isAuthenticated ? (
+            !isMobile ? (
+              UserMenu
+            ) : null
+          ) : (
+            !isMobile && (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  component={Link}
+                  to="/sign-in"
+                  startIcon={<LoginIcon />}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    fontWeight: 500,
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  component={Link}
+                  to="/sign-up"
+                  startIcon={<RocketLaunchIcon />}
+                  variant="contained"
+                  sx={{
+                    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    color: theme.palette.primary.contrastText,
+                  }}
+                >
+                  Começar Agora
+                </Button>
+              </Box>
+            )
+          )}
+        </Toolbar>
+        {DrawerMenu}
+      </AppBar>
+    </Slide>
   );
 }
 
