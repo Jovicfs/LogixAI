@@ -41,17 +41,18 @@ function PostGeneratorUI() {
   const fetchPostHistory = async () => {
     try {
       setHistoryLoading(true);
+      setError(null);
       const response = await fetch('http://localhost:5000/post/history', {
         credentials: 'include'
       });
       const data = await response.json();
       if (response.ok) {
         setSavedPosts(data.posts || []);
-      } else {
+      } else{
         setSavedPosts([]);
         setError(data.error || 'Erro ao buscar histórico');
       }
-    } catch (err) {
+    } catch (err){
       setSavedPosts([]);
       setError('Erro ao buscar histórico');
     } finally {

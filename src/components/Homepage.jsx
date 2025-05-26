@@ -47,9 +47,9 @@ function HomePage() {
         },
         {
             title: 'Editor de Imagens',
-            description: 'Edite imagens com IA.',
+            description: 'Remova backgrounds de imagens.',
             icon: <ImageIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
-            path: '/edit-image',
+            path: '/remove-background',
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
         },
         {

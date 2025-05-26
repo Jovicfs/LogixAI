@@ -12,6 +12,7 @@ import CreateLogo from './components/CreateLogo';
 import GenerateImage from './components/GenerateImage';
 import AIChat from './components/AIChat';
 import PostGenerator from './components/shared/PostGenerator';
+import RemoveBackground from './components/RemoveBackground';
 
 export const AuthContext = createContext(null);
 
@@ -60,6 +61,7 @@ function App() {
                     <Route path="/create-image" element={<GenerateImage />} />
                     <Route path="/ai-chat" element={<AIChat />} />
                     <Route path="/post-generator" element={<PostGenerator />} />
+                    <Route path="/remove-background" element={<RemoveBackground />} />
                 </Routes>
             </AuthContext.Provider>
         </ThemeProvider>
