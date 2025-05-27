@@ -6,12 +6,12 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import PublishIcon from '@mui/icons-material/Publish';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import Header from '../shared/Header';
-import Toast from '../shared/Toast';
-import withProtectedRoute from '../shared/ProtectedRoute';
+import Header from './shared/Header';
+import Toast from './shared/Toast';
+import withProtectedRoute from './shared/ProtectedRoute';
 import { useTheme } from '@mui/material/styles';
 
-function PostGeneratorUI() {
+function PostGeneratorUI({ mode, onToggleTheme }) {
   const theme = useTheme();
   const [savedPosts, setSavedPosts] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
@@ -170,68 +170,36 @@ function PostGeneratorUI() {
 
   // Only show history section ONCE, above the form and not inside the generated post card
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: theme.palette.background.default }}
-    >
-      <Header />
+    <div className={`min-h-screen ${mode === 'dark' ? 'dark' : 'light'} bg-[var(--bg-default)] text-[var(--text-primary)]`}>
+      <Header onToggleTheme={onToggleTheme} mode={mode} />
       <Box
         maxWidth={800}
         mx="auto"
         px={3}
-        sx={{
-          pt: '100px',
-          pb: 4,
-          minHeight: 'calc(100vh - 64px)',
-          display: 'flex',
-          flexDirection: 'column',
-          background: theme.palette.background.default,
-        }}
+        className="pt-24 pb-4 min-h-[calc(100vh-64px)] flex flex-col"
       >
-        <Typography
+        {/* Title */}
+        <Typography 
           variant="h4"
-          fontWeight="bold"
-          gutterBottom
-          textAlign="center"
-          sx={{
-            mb: 4,
-            color: theme.palette.text.primary,
-          }}
+          className="text-center font-bold mb-8 text-[var(--text-primary)]"
         >
           Gerador de Posts com IA
         </Typography>
 
-        {/* Show history section only if there is history */}
+        {/* History Section */}
         {savedPosts.length > 0 && (
-          <Box
-            mt={2}
-            borderTop={1}
-            borderColor={theme.palette.divider}
-            pt={2}
-          >
-            <Typography
-              variant="h6"
-              gutterBottom
-              display="flex"
-              alignItems="center"
-              sx={{ color: theme.palette.text.primary }}
-            >
-              Histórico de Posts
+          <div className="mt-2 border-t border-[var(--divider)] pt-2">
+            <div className="flex items-center mb-2">
+              <h6 className="font-semibold text-[var(--text-primary)]">Histórico de Posts</h6>
               {historyLoading && (
-                <CircularProgress size={20} sx={{ ml: 2, color: theme.palette.primary.main }} />
+                <CircularProgress size={20} className="ml-2 text-[var(--primary)]" />
               )}
-            </Typography>
-            <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+            </div>
+            <div className="max-h-96 overflow-auto">
               {savedPosts.map((savedPost) => (
-                <Card
+                <div 
                   key={savedPost.id}
-                  sx={{
-                    mb: 2,
-                    p: 2,
-                    background: theme.palette.background.paper,
-                    color: theme.palette.text.primary,
-                    boxShadow: theme.shadows[1],
-                  }}
+                  className="mb-2 p-4 rounded-lg bg-[var(--bg-paper)] shadow"
                 >
                   <Box display="flex" justifyContent="space-between">
                     <Box>
@@ -267,12 +235,13 @@ function PostGeneratorUI() {
                       </IconButton>
                     </Box>
                   </Box>
-                </Card>
+                </div>
               ))}
-            </Box>
-          </Box>
+            </div>
+          </div>
         )}
 
+        {/* Form Fields */}
         <TextField
           fullWidth
           label="Tópico"
@@ -280,12 +249,12 @@ function PostGeneratorUI() {
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           margin="normal"
-          InputLabelProps={{ style: { color: theme.palette.text.secondary } }}
+          className="bg-[var(--bg-paper)] text-[var(--text-primary)]"
           InputProps={{
-            style: {
-              color: theme.palette.text.primary,
-              background: theme.palette.background.paper,
-            },
+            className: "text-[var(--text-primary)]",
+          }}
+          InputLabelProps={{
+            className: "text-[var(--text-secondary)]",
           }}
         />
 
@@ -344,63 +313,55 @@ function PostGeneratorUI() {
           </TextField>
         </Box>
 
+        {/* Action Buttons */}
         <Button
           fullWidth
           variant="contained"
-          size="large"
-          sx={{
-            mt: 2,
-            mb: 4,
-            fontWeight: 'bold',
-            fontSize: '1rem',
-            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            color: theme.palette.primary.contrastText,
-            boxShadow: theme.shadows[2],
-          }}
+          className="mt-4 mb-8 font-bold text-base gradient-primary text-white shadow-md"
           onClick={handleGenerate}
           disabled={loading || !topic}
         >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Gerar Post'}
+          {loading ? <CircularProgress size={24} className="text-white" /> : 'Gerar Post'}
         </Button>
 
-        {error && (
-          <Toast
-            message={error}
-            type="error"
-            onClose={() => setError(null)}
-          />
-        )}
-        
+        {/* Generated Post Card */}
         {post && (
-          <Card
-            variant="outlined"
-            sx={{
-              p: 3,
-              backgroundColor: theme.palette.background.paper,
-              color: theme.palette.text.primary,
-              boxShadow: theme.shadows[2],
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ color: theme.palette.text.primary }}>
-              {topic}
-            </Typography>
-            <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: theme.palette.text.primary }}>
-              {post}
-            </Typography>
-
-            <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="body2" color="textSecondary" sx={{ color: theme.palette.text.secondary }}>
+          <div className="p-6 bg-[var(--bg-paper)] rounded-lg shadow">
+            <h6 className="font-bold mb-2 text-[var(--text-primary)]">{topic}</h6>
+            <p className="whitespace-pre-wrap break-words text-[var(--text-primary)]">{post}</p>
+            <div className="mt-4 flex justify-between items-center">
+              <span className="text-sm text-[var(--text-secondary)]">
                 {format} - {tone} - {wordCount} palavras
-              </Typography>
-              <Typography variant="body2" color="textSecondary" sx={{ color: theme.palette.text.secondary }}>
-                Gerado em: {new Date().toLocaleString()}
-              </Typography>
-            </Box>
-          </Card>
+              </span>
+              <span className="text-sm text-[var(--text-secondary)]">
+                Gerado em: {new Date().toLocaleString()}  
+              </span>
+            </div>
+          </div>
         )}
 
-        {/* Edit Dialog (always available, not inside the post card) */}
-        <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="md" fullWidth>
+        {/* Action Icons */}
+        <div className="flex justify-around mt-4">
+          <IconButton onClick={handleCopy} sx={{ color: theme.palette.primary.main }}>
+            <ContentCopyIcon />
+          </IconButton>
+          <IconButton onClick={handleSavePost} sx={{ color: theme.palette.success.main }}>
+            <SaveIcon />
+          </IconButton>
+          <IconButton onClick={handleGenerate} sx={{ color: theme.palette.secondary.main }}>
+            <ReplayIcon />
+          </IconButton>
+          <IconButton sx={{ color: theme.palette.info.main }}>
+            <PublishIcon />
+          </IconButton>
+        </div>
+
+        {/* Dialog */}
+        <Dialog 
+          open={editDialogOpen} 
+          onClose={() => setEditDialogOpen(false)}
+          className="bg-[var(--bg-paper)] text-[var(--text-primary)]"
+        >
           <DialogTitle sx={{ color: theme.palette.text.primary }}>Editar Post</DialogTitle>
           <DialogContent>
             {selectedPost && (
@@ -454,21 +415,6 @@ function PostGeneratorUI() {
             </Button>
           </DialogActions>
         </Dialog>
-
-        <Box display="flex" justifyContent="space-around" mt={2}>
-          <IconButton onClick={handleCopy} sx={{ color: theme.palette.primary.main }}>
-            <ContentCopyIcon />
-          </IconButton>
-          <IconButton onClick={handleSavePost} sx={{ color: theme.palette.success.main }}>
-            <SaveIcon />
-          </IconButton>
-          <IconButton onClick={handleGenerate} sx={{ color: theme.palette.secondary.main }}>
-            <ReplayIcon />
-          </IconButton>
-          <IconButton sx={{ color: theme.palette.info.main }}>
-            <PublishIcon />
-          </IconButton>
-        </Box>
       </Box>
     </div>
   );

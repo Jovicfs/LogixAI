@@ -166,7 +166,7 @@ function HomePage() {
                         </div>
                     </motion.div>          
                 </div>
-                          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3w5MTMyMnwwfDF8c2VhcmNofDh8fGludGVsbGlnZW5jZXxlbnwwfHx8fDE2ODU4MzIzOTZ8MA&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-35"></div>
+                          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3w5MTMyMnwwfDF8c2VhcmNofDh8fGludGVsbGlnZW5jZXxlbnwwfHx8fDE2ODU4MzIzOTZ8MA&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-slate-700 bg-center opacity-15"></div>
 
                 <motion.div
                     className="absolute bottom-4 left-1/2 transform -translate-x-1/2 cursor-pointer z-20"

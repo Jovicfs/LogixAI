@@ -11,7 +11,7 @@ import About from './components/about';
 import CreateLogo from './components/CreateLogo';
 import GenerateImage from './components/GenerateImage';
 import AIChat from './components/AIChat';
-import PostGenerator from './components/shared/PostGenerator';
+import PostGenerator from './components/PostGenerator';
 import RemoveBackground from './components/RemoveBackground';
 
 export const AuthContext = createContext(null);

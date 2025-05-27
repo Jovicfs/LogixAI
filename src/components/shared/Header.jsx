@@ -133,7 +133,7 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
               : 'none',
             '&:hover': {
               background: `linear-gradient(90deg, ${theme.palette.primary.light}22, ${theme.palette.secondary.light}22)`,
-              color: theme.palette.primary.main,
+              color: theme.palette.primary.paper,
             }
           }}
         >
