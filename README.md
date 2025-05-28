@@ -10,8 +10,10 @@ O LogixAl é uma plataforma online que utiliza inteligência artificial para sim
 ## Funcionalidades
 
 *   **Design de Logos:** Crie identidades visuais únicas e personalizadas.
+*   **Removedor de Background:** Remova Backgrounds de imagens rápido com auxilio de IA.
 *   **Geração de Imagens:** Transforme suas ideias em arte digital com o poder da IA.
-*   **Edição Inteligente:** Utilize ferramentas avançadas de edição com auxílio da IA.
+*   **Chat com IA:** Modelo de chat utilizando GPT 4.1 com acesso (limitado).
+*   **Gerador de post inteligente**:** Modelo pré treinado para lidar de forma avançada com redes sociais utilizando GPT 4.1.
 
 ## Como Usar
 
@@ -24,10 +26,11 @@ Para usar o LogixAl, visite nosso site.
 
 ## Tecnologias Utilizadas 
 
-*   [Framework/Linguagem de programação principal] (Python, JavaScript)
+*   [Linguagem de programação principal] (Python (Backend), JavaScript (FrontEnd))
 *   [Framework de front-end] (React)
+*   [Framework de back-end] (flask)
 *   [Banco de dados] (PostgreSQL)
-*   [Serviços de nuvem] (Google Cloud)
+*   [Serviços de nuvem] (Microsoft Azure)
 
 ## Instalação (Se aplicável - Remova se for apenas um site)
 
