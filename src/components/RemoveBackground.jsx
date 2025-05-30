@@ -24,6 +24,7 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { AutoModel, AutoProcessor, env, RawImage } from '@xenova/transformers';
+import withProtectedRoute from './shared/ProtectedRoute';
 
 env.allowLocalModels = false;
 env.backends.onnx.wasm.proxy = true;
@@ -426,4 +427,5 @@ function RemoveBackground() {
   );
 }
 
-export default RemoveBackground;
+// Modificar a exportação para usar o HOC
+export default withProtectedRoute(RemoveBackground);

@@ -5,3 +5,10 @@ __pycache__/
 .cache/
 .cache
 .cache/*
+uploads/
+models/Real-ESRGAN/
+models/*.pth
+uploads/
+models/Real-ESRGAN/
+*.pth
+*.onnx

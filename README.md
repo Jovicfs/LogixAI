@@ -106,7 +106,7 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 
 [Victor Ferreira] - [joaovictorferrari4@gmail.com]
 
-Projeto: [https://github.com/seu-usuario/LogixAI](https://github.com/seu-usuario/LogixAI)
+Projeto: [https://github.com/jovicfs/LogixAI](https://github.com/jovicfs/LogixAI)
 
 ---
 ⭐️ Desenvolvido com 💙 pelo time LogixAI

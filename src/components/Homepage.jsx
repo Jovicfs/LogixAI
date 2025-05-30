@@ -39,11 +39,34 @@ function HomePage() {
             gradient: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
         },
         {
-            title: 'Posts IA',
-            description: 'Gere posts para redes sociais.',
-            icon: <ArticleIcon sx={{ fontSize: 32, color: theme.palette.warning.contrastText }} />,
-            path: '/post-generator',
-            gradient: `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`
+            title: 'Melhorar Imagem',
+            description: 'Aprimore a qualidade de suas imagens.',
+            icon: <ImageIcon sx={{ fontSize: 32, color: theme.palette.secondary.contrastText }} />,
+            path: '/enhance-image',
+            gradient: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`
+        },
+        {
+            title: 'Vídeos IA',
+            description: 'Gere vídeos para redes sociais.',
+            icon: <VideoLibraryIcon sx={{ fontSize: 32, color: theme.palette.info.contrastText }} />,
+            path: '/video-generator',
+            gradient: `linear-gradient(90deg, ${theme.palette.info.main}, ${theme.palette.info
+.light})`
+        },
+        {
+            title: 'Músicas IA',
+            description: 'Crie músicas personalizadas.',
+            icon: <GraphicEqIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
+            path: '/music-generator',
+            gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
+        },
+        {
+            title: 'Artigos IA',
+            description: 'Gere artigos e textos.',
+            icon: <ArticleIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
+            path: '/article-generator',
+            gradient: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary
+.light})`
         },
         {
             title: 'Remover Fundo',
@@ -51,20 +74,6 @@ function HomePage() {
             icon: <ImageIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/remove-background',
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
-        },
-        {
-            title: 'Vídeos com IA',
-            description: 'Crie vídeos incríveis em instantes.',
-            icon: <VideoLibraryIcon sx={{ fontSize: 32, color: theme.palette.error.contrastText }} />,
-            path: '/create-video',
-            gradient: `linear-gradient(90deg, ${theme.palette.error.main}, ${theme.palette.error.light})`
-        },
-        {
-            title: 'Sintetizador de Voz',
-            description: 'Transforme texto em fala natural.',
-            icon: <GraphicEqIcon sx={{ fontSize: 32, color: theme.palette.info.contrastText }} />,
-            path: '/text-to-speech',
-            gradient: `linear-gradient(90deg, ${theme.palette.info.main}, ${theme.palette.info.light})`
         },
         {
             title: 'Imagens IA',
@@ -79,13 +88,6 @@ function HomePage() {
             icon: <ChatBubbleOutlineIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/ai-chat',
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
-        },
-        {
-            title: 'Premium',
-            description: 'Acesso completo.',
-            icon: <WorkspacePremiumIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
-            path: '/pricing',
-            gradient: `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`
         }
     ];
 

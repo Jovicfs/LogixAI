@@ -12,6 +12,7 @@ from routes.post import post_bp
 from routes.chat import chat_bp
 from routes.mercado_pago_integration import create_preference
 from routes.post_history import post_history_bp
+from routes.enhance import enhance_bp
 from data.db import init_db
 
 load_dotenv()
@@ -57,6 +58,7 @@ def create_app():
     app.register_blueprint(post_bp)
     app.register_blueprint(chat_bp)
     app.register_blueprint(post_history_bp)
+    app.register_blueprint(enhance_bp)
 
 
     # Tratamento de erros

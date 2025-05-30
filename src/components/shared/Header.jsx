@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../App';
 import { auth } from '../../utils/api';
@@ -33,6 +33,8 @@ import ImageIcon from '@mui/icons-material/Image';
 import ChatIcon from '@mui/icons-material/Chat';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import CloseIcon from '@mui/icons-material/Close';
+import { Settings as SettingsIcon } from '@mui/icons-material';
+import UserSettingsDialog from './UserSettingsDialog';
 
 function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   const { authState } = useContext(AuthContext);
@@ -66,16 +68,12 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
       title: 'Remover Fundo',
       path: '/remove-background',
       icon: <ImageIcon fontSize="small" />
-    },
-    {
-      title: 'Planos',
-      path: '/pricing',
-      icon: <MonetizationOnIcon fontSize="small" />
     }
   ];
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleMenu = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
@@ -267,12 +265,25 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
             {buttonText}
           </MenuItem>
         )}
+        <MenuItem onClick={() => {
+          handleClose();
+          setSettingsOpen(true);
+        }}>
+          <SettingsIcon sx={{ mr: 1 }} />
+          Configurações
+        </MenuItem>
         <Divider />
         <MenuItem onClick={handleLogout}>
           <LogoutIcon sx={{ mr: 1 }} />
           Sair
         </MenuItem>
       </Menu>
+
+      <UserSettingsDialog 
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        currentUser={authState}
+      />
     </>
   );
 

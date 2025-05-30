@@ -13,6 +13,7 @@ import GenerateImage from './components/GenerateImage';
 import AIChat from './components/AIChat';
 import PostGenerator from './components/PostGenerator';
 import RemoveBackground from './components/RemoveBackground';
+import EnhanceImage from './components/EnhanceImage';
 
 export const AuthContext = createContext(null);
 
@@ -55,13 +56,13 @@ function App() {
                     <Route path="/sign-in" element={<Signin />} />
                     <Route exact path="/" element={<Homepage />} />
                     <Route path="/sign-up" element={<Signup />} />
-                    <Route path="/pricing" element={<Pricing />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/create-logo" element={<CreateLogo />} />
                     <Route path="/create-image" element={<GenerateImage />} />
                     <Route path="/ai-chat" element={<AIChat />} />
                     <Route path="/post-generator" element={<PostGenerator />} />
                     <Route path="/remove-background" element={<RemoveBackground />} />
+                    <Route path="/enhance-image" element={<EnhanceImage />} />
                 </Routes>
             </AuthContext.Provider>
         </ThemeProvider>

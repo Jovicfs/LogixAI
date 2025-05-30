@@ -6,6 +6,8 @@
   "scripts": {
     "create-venv": "cd server && python -m venv venv",
     "install-deps": "cd server && venv\\Scripts\\python -m pip install --upgrade pip && venv\\Scripts\\python -m pip install -r requirements.txt",
+    "setup-python": "cd server && venv\\Scripts\\python setup.py",
+    "setup": "npm run create-venv && npm run install-deps && npm run setup-python",
     "server": "cd server && venv\\Scripts\\python app.py",
     "dev": "vite",
     "build": "vite build",
