@@ -61,12 +61,11 @@ function HomePage() {
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
         },
         {
-            title: 'Artigos IA',
-            description: 'Gere artigos e textos.',
+            title: 'Gerador de conteúdo',
+            description: 'Gere artigos e posts para insigths de redes sociais.',
             icon: <ArticleIcon sx={{ fontSize: 32, color: theme.palette.primary.contrastText }} />,
-            path: '/article-generator',
-            gradient: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary
-.light})`
+            path: '/post-generator',
+            gradient: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
         },
         {
             title: 'Remover Fundo',

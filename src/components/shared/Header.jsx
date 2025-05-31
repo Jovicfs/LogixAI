@@ -35,6 +35,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import CloseIcon from '@mui/icons-material/Close';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import UserSettingsDialog from './UserSettingsDialog';
+import logixaiLogo from '../../utils/brain-brainstorm-creative-svgrepo-com.svg';
 
 function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   const { authState } = useContext(AuthContext);
@@ -92,24 +93,33 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
 
   // Modern gradient logo
   const Logo = (
-    <Typography
-      variant="h5"
-      noWrap
-      component={Link}
-      to="/"
-      sx={{
-        fontWeight: 900,
-        letterSpacing: 1,
-        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        textDecoration: 'none',
-        mr: 2,
-        fontFamily: 'Inter, Roboto, Helvetica, Arial, sans-serif',
-      }}
-    >
-      LogixAI
-    </Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <img 
+        src={logixaiLogo} 
+        alt="LogixAI Logo" 
+        style={{ 
+          height: '40px', 
+          marginRight: '8px'
+        }} 
+      />
+      <Typography
+        variant="h5"
+        noWrap
+        component={Link}
+        to="/"
+        sx={{
+          fontWeight: 900,
+          letterSpacing: 1,
+          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          textDecoration: 'none',
+          fontFamily: 'Inter, Roboto, Helvetica, Arial, sans-serif',
+        }}
+      >
+        LogixAI 
+      </Typography>
+    </Box>
   );
 
   // Navigation links for desktop

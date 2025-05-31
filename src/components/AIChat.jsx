@@ -175,25 +175,42 @@ function AIChat() {
             top-0 left-0 z-40
             w-3/4 sm:w-80 md:w-64
             h-screen md:h-[80vh]
-            bg-gray-100 border-r rounded-r-xl md:rounded-xl
+            ${theme.palette.mode === 'dark' ? 'bg-[#23232a]' : 'bg-gray-100'}
             overflow-y-auto shadow-lg md:shadow-sm
             mt-16 md:mt-0
             flex flex-col
           `}
-          style={{ 
+          style={{
             background: theme.palette.background.paper,
-            borderColor: theme.palette.divider 
+            borderColor: theme.palette.divider
           }}
         >
-          <div className="p-4 border-b flex items-center gap-2 font-semibold text-gray-700">
+          <div
+            className="p-4 border-b flex items-center gap-2 font-semibold"
+            style={{
+              color: theme.palette.text.primary,
+              borderColor: theme.palette.divider,
+              background: theme.palette.background.paper
+            }}
+          >
             <History size={20} />
             Histórico
           </div>
-          <div className="flex-1 p-4 space-y-2 overflow-y-auto"> {/* Adicionado flex-1 e overflow */}
+          <div
+            className="flex-1 p-4 space-y-2 overflow-y-auto"
+            style={{
+              background: theme.palette.background.default
+            }}
+          >
             {history.length === 0 && (
-              <p className="text-gray-400 text-sm">Nenhuma conversa salva.</p>
+              <p
+                className="text-sm"
+                style={{ color: theme.palette.text.secondary }}
+              >
+                Nenhuma conversa salva.
+              </p>
             )}
-            {history.map((conversation, index) => { // 'conversation' é um objeto { id: "...", messages: [...] }
+            {history.map((conversation, index) => {
               // Encontre a primeira mensagem do usuário para usar como título
               const firstUserMessage = conversation.messages.find(msg => msg.role === 'user');
               const title = firstUserMessage ? firstUserMessage.content : 'Nova Conversa';
@@ -203,38 +220,65 @@ function AIChat() {
 
               return (
                 <button
-                  key={conversation.id || index} 
+                  key={conversation.id || index}
                   onClick={() => handleHistoryClick(conversation)}
                   className={`
-                    block w-full text-left  border text-sm truncate hover:bg-gray-100 hover:shadow-sm p-3 rounded-md transition
-                    ${isSelected ? 'bg-blue-100 border-blue-300 text-blue-800 font-semibold' : 'bg-white hover:bg-gray-100 text-gray-700 border-gray-200'}
+                    block w-full text-left border text-sm truncate p-3 rounded-md transition
+                    ${isSelected
+                      ? (theme.palette.mode === 'dark'
+                          ? 'bg-blue-900 border-blue-700 text-blue-200 font-semibold'
+                          : 'bg-blue-100 border-blue-300 text-blue-800 font-semibold')
+                      : ''}
                   `}
+                  style={{
+                    background: isSelected
+                      ? (theme.palette.mode === 'dark'
+                          ? '#1e293b'
+                          : theme.palette.action.selected)
+                      : theme.palette.background.paper,
+                    color: isSelected
+                      ? (theme.palette.mode === 'dark'
+                          ? theme.palette.primary.light
+                          : theme.palette.primary.contrastText)
+                      : theme.palette.text.primary,
+                    borderColor: isSelected
+                      ? theme.palette.primary.light
+                      : theme.palette.divider
+                  }}
                   title={title}
                 >
-                  {firstUserMessage ? <ThreePIcon fontSize="large" className="text-blue-500 px-1" /> : ''} 
+                  {firstUserMessage ? <ThreePIcon fontSize="large" className="text-blue-500 px-1" /> : ''}
                   {title.slice(0, 50)}{title.length > 50 ? '...' : ''}
                   <div>
-                      <span className="text-gray-400 text-xs ml-2">
-                    {new Date(conversation.messages[0].created_at).toLocaleDateString('pt-BR', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                    })}
-                  </span>
+                    <span
+                      className="text-xs ml-2"
+                      style={{ color: theme.palette.text.secondary }}
+                    >
+                      {new Date(conversation.messages[0].created_at).toLocaleDateString('pt-BR', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                      })}
+                    </span>
                   </div>
                 </button>
-                
               );
             })}
           </div>
-          <div className="p-4 border-t"> {/* Botão de nova conversa no final da sidebar */}
-                <button
-                    onClick={startNewConversation}
-                    className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
-                >
-                    <PlusCircle size={18} /> Nova Conversa
-                </button>
-            </div>
+          <div
+            className="p-4 border-t"
+            style={{
+              background: theme.palette.background.paper,
+              borderColor: theme.palette.divider
+            }}
+          >
+            <button
+              onClick={startNewConversation}
+              className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+            >
+              <PlusCircle size={18} /> Nova Conversa
+            </button>
+          </div>
         </aside>
 
         {/* Overlay for mobile */}
@@ -301,12 +345,23 @@ function AIChat() {
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSubmit} className="border-t bg-white p-2 sm:p-4">
+          <form onSubmit={handleSubmit} className="border-t p-2 sm:p-4"
+            style={{
+              background: theme.palette.mode === 'dark'
+                ? theme.palette.background.paper
+                : '#fff',
+              borderColor: theme.palette.divider
+            }}
+          >
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => fileInputRef.current.click()}
                 className="text-gray-500 hover:text-blue-600 p-2"
+                style={{
+                  background: theme.palette.mode === 'dark' ? theme.palette.background.default : undefined,
+                  borderRadius: 8
+                }}
               >
                 <ImageIcon size={20} />
               </button>
@@ -319,11 +374,17 @@ function AIChat() {
               />
               <input
                 type="text"
-                className="flex-grow border border-gray-300 rounded-xl px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-grow border rounded-xl px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2"
                 placeholder="Digite sua mensagem..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 disabled={isLoading}
+                style={{
+                  background: theme.palette.background.paper,
+                  color: theme.palette.text.primary,
+                  borderColor: theme.palette.divider,
+                  boxShadow: 'none'
+                }}
               />
               <button
                 type="submit"

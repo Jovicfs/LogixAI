@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useMemo } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import theme from './theme';
+import getTheme from './theme';
 
 import Signin from './components/signin';
 import Homepage from './components/Homepage';
@@ -16,6 +16,7 @@ import RemoveBackground from './components/RemoveBackground';
 import EnhanceImage from './components/EnhanceImage';
 
 export const AuthContext = createContext(null);
+export const DarkModeContext = createContext();
 
 function App() {
     const [authState, setAuthState] = useState({
@@ -23,6 +24,10 @@ function App() {
         username: null,
         loading: true
     });
+
+    const [darkMode, setDarkMode] = useState(
+        localStorage.getItem('logixai_darkmode') === 'true'
+    );
 
     useEffect(() => {
         fetch('http://localhost:5000/verify-session', {
@@ -48,23 +53,32 @@ function App() {
         });
     }, []);
 
+    useEffect(() => {
+        document.documentElement.classList.toggle('dark', darkMode);
+        localStorage.setItem('logixai_darkmode', darkMode);
+    }, [darkMode]);
+
+    const theme = useMemo(() => getTheme(darkMode), [darkMode]);
+
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AuthContext.Provider value={{ authState, setAuthState }}>
-                <Routes>
-                    <Route path="/sign-in" element={<Signin />} />
-                    <Route exact path="/" element={<Homepage />} />
-                    <Route path="/sign-up" element={<Signup />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/create-logo" element={<CreateLogo />} />
-                    <Route path="/create-image" element={<GenerateImage />} />
-                    <Route path="/ai-chat" element={<AIChat />} />
-                    <Route path="/post-generator" element={<PostGenerator />} />
-                    <Route path="/remove-background" element={<RemoveBackground />} />
-                    <Route path="/enhance-image" element={<EnhanceImage />} />
-                </Routes>
-            </AuthContext.Provider>
+            <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
+                <AuthContext.Provider value={{ authState, setAuthState }}>
+                    <Routes>
+                        <Route path="/sign-in" element={<Signin />} />
+                        <Route exact path="/" element={<Homepage />} />
+                        <Route path="/sign-up" element={<Signup />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/create-logo" element={<CreateLogo />} />
+                        <Route path="/create-image" element={<GenerateImage />} />
+                        <Route path="/ai-chat" element={<AIChat />} />
+                        <Route path="/post-generator" element={<PostGenerator />} />
+                        <Route path="/remove-background" element={<RemoveBackground />} />
+                        <Route path="/enhance-image" element={<EnhanceImage />} />
+                    </Routes>
+                </AuthContext.Provider>
+            </DarkModeContext.Provider>
         </ThemeProvider>
     );
 }

@@ -11,7 +11,11 @@ client = AzureOpenAI(
     api_key=os.getenv('AZURE_OPENAI_API_KEY'),
     api_version=os.getenv('AZURE_OPENAI_API_VERSION'),
     azure_endpoint=os.getenv('AZURE_OPENAI_API_ENDPOINT')
+    
 )
+
+
+
 
 @post_bp.route('/generate', methods=['POST'])
 def generate_post():
@@ -35,6 +39,7 @@ def generate_post():
                 {"role": "user", "content": f"Create a {data.get('format', 'blog post')} about {data['topic']} "
                                           f"in a {data.get('tone', 'professional')} tone, "
                                           f"with approximately {data.get('wordCount', 300)} words."}
+                                          
             ],
             temperature=0.7,
             max_tokens=1000
