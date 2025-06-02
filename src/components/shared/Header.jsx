@@ -36,6 +36,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import UserSettingsDialog from './UserSettingsDialog';
 import logixaiLogo from '../../utils/brain-brainstorm-creative-svgrepo-com.svg';
+import NavDropdownMenu from './NavDropdownMenu';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import TuneIcon from '@mui/icons-material/Tune';
+import CodeIcon from '@mui/icons-material/Code';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import MovieCreationIcon from '@mui/icons-material/MovieCreation';
 
 function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   const { authState } = useContext(AuthContext);
@@ -44,33 +50,58 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const features = [
-    {
-      title: 'Gerar Logo',
-      path: '/create-logo',
-      icon: <AutoAwesomeIcon fontSize="small" />
-    },
-    {
-      title: 'Gerar Post',
-      path: '/post-generator',
-      icon: <RocketLaunchIcon fontSize="small" />
-    },
-    {
-      title: 'Gerar Imagem',
-      path: '/create-image',
-      icon: <ImageIcon fontSize="small" />
-    },
-    {
-      title: 'Chat com IA',
-      path: '/ai-chat',
-      icon: <ChatIcon fontSize="small" />
-    },
-    {
-      title: 'Remover Fundo',
-      path: '/remove-background',
-      icon: <ImageIcon fontSize="small" />
-    }
-  ];
+const features = [
+  {
+    title: 'Gerar Logo',
+    path: '/create-logo',
+    icon: <AutoAwesomeIcon fontSize="small" /> // ok
+  },
+  {
+    title: 'Gerar Post',
+    path: '/post-generator',
+    icon: <RocketLaunchIcon fontSize="small" /> // bom para ideias ou lançamento de conteúdo
+  },
+  {
+    title: 'Gerar Imagem',
+    path: '/create-image',
+    icon: <ImageIcon fontSize="small" />
+  },
+  {
+    title: 'Chat com IA',
+    path: '/ai-chat',
+    icon: <ChatIcon fontSize="small" />
+  },
+  {
+    title: 'Remover Fundo',
+    path: '/remove-background',
+    icon: <AutoFixHighIcon fontSize="small" /> // melhor que repetir o ícone de imagem
+  },
+  {
+    title: 'Melhorar Imagem',
+    path: '/image-enhancer',
+    icon: <TuneIcon fontSize="small" /> // representa ajustes e melhorias
+  },
+  {
+    title: 'Gerar Código',
+    path: '/code-generator',
+    icon: <CodeIcon fontSize="small" />
+  },
+  {
+    title: 'Gerar Música',
+    path: '/music-generator',
+    icon: <MusicNoteIcon fontSize="small" />
+  },
+  {
+    title: 'Gerar Vídeo',
+    path: '/video-generator',
+    icon: <MovieCreationIcon fontSize="small" />
+  },
+  {
+    title: 'Premium',
+    path: '/pricing',
+    icon: <MonetizationOnIcon fontSize="small" />
+  }
+];
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -110,9 +141,11 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
         sx={{
           fontWeight: 900,
           letterSpacing: 1,
-          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          background: 'linear-gradient(90deg, #00F5FF, #8A2BE2, #FF00FF, #FF1493)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
+          animation: 'pulseText 10s infinite linear',
+          color: theme.palette.primary.contrastText,
           textDecoration: 'none',
           fontFamily: 'Inter, Roboto, Helvetica, Arial, sans-serif',
         }}
@@ -123,33 +156,15 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
   );
 
   // Navigation links for desktop
-  const NavLinks = (
-    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
-      {features.map(feature => (
-        <Button
-          key={feature.path}
-          component={Link}
-          to={feature.path}
-          startIcon={feature.icon}
-          sx={{
-            color: location.pathname === feature.path ? theme.palette.primary.main : theme.palette.text.secondary,
-            fontWeight: 500,
-            borderRadius: 2,
-            px: 2,
-            background: location.pathname === feature.path
-              ? `linear-gradient(90deg, ${theme.palette.primary.light}, ${theme.palette.secondary.light})`
-              : 'none',
-            '&:hover': {
-              background: `linear-gradient(90deg, ${theme.palette.primary.light}22, ${theme.palette.secondary.light}22)`,
-              color: theme.palette.primary.paper,
-            }
-          }}
-        >
-          {feature.title}
-        </Button>
-      ))}
-    </Box>
-  );
+const NavLinks = (
+  <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', marginLeft: 2 }}>
+    <NavDropdownMenu
+      title="Ferramentas de IA"
+      items={features}
+      sx={{ marginRight: 2, color: theme.palette.text.primary }}
+    />
+  </Box>
+);
 
   // Drawer for mobile navigation
   const DrawerMenu = (
@@ -236,6 +251,8 @@ function Header({ onShowLogos, buttonText = "Meus Logos" }) {
               >
                 Começar Agora
               </Button>
+
+
             </>
           )}
         </Box>

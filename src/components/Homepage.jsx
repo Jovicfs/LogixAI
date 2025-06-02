@@ -87,7 +87,14 @@ function HomePage() {
             icon: <ChatBubbleOutlineIcon sx={{ fontSize: 32, color: theme.palette.success.contrastText }} />,
             path: '/ai-chat',
             gradient: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.success.light})`
-        }
+        },     
+        {
+            title: 'Assinatura Premium',
+            description: 'Acesso a recursos exclusivos.',
+            icon: <WorkspacePremiumIcon sx={{ fontSize: 32, color: theme.palette.warning.contrastText }} />,
+            path: '/pricing',
+            gradient: `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`
+            }
     ];
 
 
